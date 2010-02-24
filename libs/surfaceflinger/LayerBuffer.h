@@ -210,6 +210,7 @@ private:
     bool            mInvalidate;
     bool            mNeedsBlending;
     copybit_device_t* mBlitEngine;
+    bool            mInvalidEGLImage;
 };
 
 // ---------------------------------------------------------------------------
