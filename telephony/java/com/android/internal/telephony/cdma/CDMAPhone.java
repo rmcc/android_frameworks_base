@@ -62,6 +62,7 @@ import com.android.internal.telephony.PhoneProxy;
 import com.android.internal.telephony.PhoneSubInfo;
 import com.android.internal.telephony.TelephonyIntents;
 import com.android.internal.telephony.TelephonyProperties;
+import com.android.internal.telephony.UUSInfo;
 
 import static com.android.internal.telephony.TelephonyProperties.PROPERTY_ICC_OPERATOR_ALPHA;
 import static com.android.internal.telephony.TelephonyProperties.PROPERTY_ICC_OPERATOR_NUMERIC;
@@ -342,6 +343,10 @@ public class CDMAPhone extends PhoneBase {
         // Need to make sure dialString gets parsed properly
         String newDialString = PhoneNumberUtils.stripSeparators(dialString);
         return mCT.dial(newDialString);
+    }
+
+    public Connection dial(String dialString, UUSInfo uusInfo) throws CallStateException {
+        throw new CallStateException("Sending UUS information NOT supported in CDMA!");
     }
 
     public SignalStrength getSignalStrength() {
@@ -1405,5 +1410,4 @@ public class CDMAPhone extends PhoneBase {
         }
         return false;
     }
-
 }
