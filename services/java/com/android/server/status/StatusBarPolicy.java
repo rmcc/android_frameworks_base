@@ -265,6 +265,12 @@ public class StatusBarPolicy {
             com.android.internal.R.drawable.stat_sys_data_out_3g,
             com.android.internal.R.drawable.stat_sys_data_inandout_3g,
         };
+    private static final int[] sDataNetType_hspa = new int[] {
+            com.android.internal.R.drawable.stat_sys_data_connected_hspa,
+            com.android.internal.R.drawable.stat_sys_data_in_hspa,
+            com.android.internal.R.drawable.stat_sys_data_out_hspa,
+            com.android.internal.R.drawable.stat_sys_data_inandout_hspa,
+        };
     private static final int[] sDataNetType_e = new int[] {
             com.android.internal.R.drawable.stat_sys_data_connected_e,
             com.android.internal.R.drawable.stat_sys_data_in_e,
@@ -353,6 +359,10 @@ public class StatusBarPolicy {
     private IBinder mCdmaRoamingIndicatorIcon;
     private IconData mCdmaRoamingIndicatorIconData;
 
+    // Wired headset
+    private IBinder mHeadsetIcon;
+    private IconData mHeadsetIconData;
+
     private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -403,6 +413,9 @@ public class StatusBarPolicy {
             }
             else if (action.equals(TtyIntent.TTY_ENABLED_CHANGE_ACTION)) {
                 updateTTY(intent);
+            }
+            else if (action.equals(Intent.ACTION_HEADSET_PLUG)) {
+                toggleHeadsetIcon(intent);
             }
         }
     };
@@ -513,7 +526,14 @@ public class StatusBarPolicy {
         mVolumeIcon = service.addIcon(mVolumeData, null);
         service.setIconVisibility(mVolumeIcon, false);
         updateVolume();
-        
+
+	//Wired headset
+        mHeadsetIconData = IconData.makeIcon(
+                "headset_active",
+                null, com.android.internal.R.drawable.stat_sys_headset, 0, 0);
+        mHeadsetIcon = service.addIcon(mHeadsetIconData, null);
+        service.setIconVisibility(mHeadsetIcon, false);
+ 
         IntentFilter filter = new IntentFilter();
 
         // Register for Intent broadcasts for...
@@ -537,6 +557,7 @@ public class StatusBarPolicy {
         filter.addAction(GpsLocationProvider.GPS_FIX_CHANGE_ACTION);
         filter.addAction(TelephonyIntents.ACTION_SIM_STATE_CHANGED);
         filter.addAction(TtyIntent.TTY_ENABLED_CHANGE_ACTION);
+        filter.addAction(Intent.ACTION_HEADSET_PLUG);
         mContext.registerReceiver(mIntentReceiver, filter, null, mHandler);
     }
 
@@ -563,6 +584,15 @@ public class StatusBarPolicy {
         // Don't display sync failing icon: BUG 1297963 Set sync error timeout to "never"
         //mService.setIconVisibility(mSyncFailingIcon, isFailing && !isActive);
     }
+
+    private final void toggleHeadsetIcon(Intent intent) {
+      boolean headsetActive = false;
+      if (intent.getIntExtra("state", 0) > 0 && intent.getStringExtra("name").equals("headset_sensor")) {
+	headsetActive = true;
+      }
+      mService.setIconVisibility(mHeadsetIcon, headsetActive);
+    }
+
 
     private void pickNextBatteryLevel(int level) {
         final int N = mBatteryThresholds.length;
@@ -992,6 +1022,9 @@ public class StatusBarPolicy {
         case TelephonyManager.NETWORK_TYPE_UMTS:
             mDataIconList = sDataNetType_3g;
             break;
+        case TelephonyManager.NETWORK_TYPE_HSPA:
+            mDataIconList = sDataNetType_hspa;
+            break;
         case TelephonyManager.NETWORK_TYPE_CDMA:
             // display 1xRTT for IS95A/B
             mDataIconList = this.sDataNetType_1xrtt;
@@ -1274,7 +1307,6 @@ public class StatusBarPolicy {
         }
         mService.updateIcon(mPhoneIcon, mPhoneData, null);
     }
-
 
     private class StatusBarHandler extends Handler {
         @Override
