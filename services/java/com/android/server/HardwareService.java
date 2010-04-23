@@ -215,6 +215,19 @@ public class HardwareService extends IHardwareService.Stub {
         }
     }
 
+    public void setHardKeyLights(int key, int status) {
+	if (key < 58 || key > 59) {
+		return;
+	}
+	int code = key == 58 ? 2 : 4;
+
+	if (status == 0) {
+		code++;
+	}
+
+	setLightFlashing_UNCHECKED(LIGHT_ID_KEYBOARD, 0, 1, code, 0);
+    }
+
     void setLightOff_UNCHECKED(int light) {
         setLight_native(mNativePointer, light, 0, LIGHT_FLASH_NONE, 0, 0);
     }

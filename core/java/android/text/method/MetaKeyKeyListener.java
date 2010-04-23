@@ -20,6 +20,12 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.text.*;
 
+/* For the hardware keyboard lights */
+import android.os.IHardwareService;
+import android.os.RemoteException;
+import android.os.ServiceManager;
+
+
 /**
  * This base class encapsulates the behavior for handling the meta keys
  * (shift and alt) and the pseudo-meta state of selecting text.
@@ -155,6 +161,14 @@ public abstract class MetaKeyKeyListener {
         adjust(content, CAP);
         adjust(content, ALT);
         adjust(content, SYM);
+
+	try {
+	    IHardwareService hardware = IHardwareService.Stub.asInterface(ServiceManager.getService("hardware"));
+	    if (getMetaState(content, META_ALT_ON) <= 0)
+	    	hardware.setHardKeyLights(58, 0);
+	    if (getMetaState(content, META_SHIFT_ON) <= 0)
+	    	hardware.setHardKeyLights(59, 0);
+	} catch (RemoteException doe) {} 
     }
 
     /**
@@ -206,14 +220,23 @@ public abstract class MetaKeyKeyListener {
      */
     public boolean onKeyDown(View view, Editable content,
                              int keyCode, KeyEvent event) {
+
+	IHardwareService hardware = IHardwareService.Stub.asInterface(ServiceManager.getService("hardware"));
+
         if (keyCode == KeyEvent.KEYCODE_SHIFT_LEFT || keyCode == KeyEvent.KEYCODE_SHIFT_RIGHT) {
             press(content, CAP);
+	    try {
+		hardware.setHardKeyLights(59, getMetaState(content, META_SHIFT_ON));
+	    } catch (RemoteException doe) {} 
             return true;
         }
 
         if (keyCode == KeyEvent.KEYCODE_ALT_LEFT || keyCode == KeyEvent.KEYCODE_ALT_RIGHT
                 || keyCode == KeyEvent.KEYCODE_NUM) {
             press(content, ALT);
+	    try {
+		hardware.setHardKeyLights(58, getMetaState(content, META_ALT_ON));
+	    } catch (RemoteException doe) {} 
             return true;
         }
 
@@ -299,6 +322,13 @@ public abstract class MetaKeyKeyListener {
         if ((states&META_ALT_ON) != 0) content.removeSpan(ALT);
         if ((states&META_SYM_ON) != 0) content.removeSpan(SYM);
         if ((states&META_SELECTING) != 0) content.removeSpan(SELECTING);
+	try {
+	    IHardwareService hardware = IHardwareService.Stub.asInterface(ServiceManager.getService("hardware"));
+	    if (hardware != null) {
+	        hardware.setHardKeyLights(58, 0);
+	        hardware.setHardKeyLights(59, 0);
+	    }
+	} catch (RemoteException doe) {}
     }
 
     /**
@@ -455,12 +485,28 @@ public abstract class MetaKeyKeyListener {
     }
 
     public long clearMetaKeyState(long state, int which) {
-        if ((which&META_SHIFT_ON) != 0)
+	int resetLeds = 0;
+        if ((which&META_SHIFT_ON) != 0) {
+	    resetLeds = 1;
             state = resetLock(state, META_SHIFT_ON, META_SHIFT_MASK);
-        if ((which&META_ALT_ON) != 0)
+	}
+        if ((which&META_ALT_ON) != 0) {
+	    resetLeds = 1;
             state = resetLock(state, META_ALT_ON, META_ALT_MASK);
+	}
         if ((which&META_SYM_ON) != 0)
             state = resetLock(state, META_SYM_ON, META_SYM_MASK);
+
+	if (resetLeds>0) {
+	    try {
+	        IHardwareService hardware = IHardwareService.Stub.asInterface(ServiceManager.getService("hardware"));
+	        if (hardware != null) {
+	            hardware.setHardKeyLights(58, 0);
+	            hardware.setHardKeyLights(59, 0);
+	        }
+	    } catch (RemoteException doe) {}
+	}
+
         return state;
     }
     

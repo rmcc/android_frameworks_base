@@ -34,5 +34,7 @@ interface IHardwareService
 
     // for the phone
     void setAttentionLight(boolean on);
+
+    void setHardKeyLights(int key, int status);
 }
 
