@@ -79,6 +79,7 @@ import android.os.ServiceManager;
 import android.os.SystemClock;
 import android.os.SystemProperties;
 import android.os.TokenWatcher;
+
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.EventLog;
@@ -4656,7 +4657,7 @@ public class WindowManagerService extends IWindowManager.Stub implements Watchdo
                 final int repeatCount = nextKey.getRepeatCount();
                 final boolean down = nextKey.getAction() != KeyEvent.ACTION_UP;
                 boolean dispatch = mKeyWaiter.checkShouldDispatchKey(keycode);
-                
+
                 if (!dispatch) {
                     if (callingUid == 0 ||
                             mContext.checkPermission(
@@ -5143,6 +5144,19 @@ public class WindowManagerService extends IWindowManager.Stub implements Watchdo
                     boolean screenIsOff = !mPowerManager.screenIsOn();
                     boolean screenIsDim = !mPowerManager.screenIsBright();
                     int actions = mPolicy.interceptKeyTq(event, !screenIsOff);
+
+		    // Start ONE hack
+		    // Change green/red key events
+                    if ((actions & WindowManagerPolicy.ACTION_TRANSLATE_KEY) != 0) {
+                    	if (event.keycode == KeyEvent.KEYCODE_ENDCALL) {
+				/* Red becomes back... */
+				event.keycode = KeyEvent.KEYCODE_BACK;
+			} else if (event.keycode == KeyEvent.KEYCODE_CALL) {
+				/* Green becomes menu... */
+				event.keycode = KeyEvent.KEYCODE_MENU;
+			}
+		    }
+		    // Finish ONE hack
 
                     if ((actions & WindowManagerPolicy.ACTION_GO_TO_SLEEP) != 0) {
                         mPowerManager.goToSleep(event.when);
