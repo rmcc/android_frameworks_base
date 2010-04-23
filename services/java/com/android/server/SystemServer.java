@@ -90,6 +90,7 @@ class ServerThread extends Thread {
         BluetoothDeviceService bluetooth = null;
         BluetoothA2dpService bluetoothA2dp = null;
         HeadsetObserver headset = null;
+        RingerSwitchObserver ringer = null;
 
         // Critical services...
         try {
@@ -334,6 +335,13 @@ class ServerThread extends Thread {
                 com.android.server.status.StatusBarPolicy.installIcons(context, statusBar);
             } catch (Throwable e) {
                 Log.e(TAG, "Failure installing status bar icons", e);
+            }
+
+            try {
+                Log.i(TAG, "Starting RingerSwitchObserver");
+                ringer = new RingerSwitchObserver(context);
+            } catch (Throwable e) {
+                Log.e(TAG, "Failure starting RingerSwitchObserver", e);
             }
         }
 
