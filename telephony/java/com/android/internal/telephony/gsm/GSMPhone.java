@@ -1423,9 +1423,12 @@ public class GSMPhone extends PhoneBase {
 
                 case EVENT_CALL_RING:
                     ar = (AsyncResult)msg.obj;
-                    if (ar.exception == null) {
-                        notifyIncomingRing();
-                    }
+		    if ((ar != null && ar.exception == null) || 
+			(ar == null && getRingingCall().getState() != GsmCall.State.IDLE)) {
+                       	notifyIncomingRing();
+			sendMessageDelayed(
+                    		obtainMessage(EVENT_CALL_RING), 6000);
+		    }
                     break;
 
                 // handle the select network completion callbacks.
