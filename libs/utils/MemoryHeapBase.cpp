@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
+ * Copyright (c) 2009, Code Aurora Forum. All rights reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,6 +39,12 @@
 namespace android {
 
 // ---------------------------------------------------------------------------
+
+MemoryHeapBase::MemoryHeapBase(int fd, size_t size, void *base)
+    : mFD(fd), mSize(size), mBase(base),
+      mDevice(NULL), mNeedUnmap(false)
+{
+}
 
 MemoryHeapBase::MemoryHeapBase() 
     : mFD(-1), mSize(0), mBase(MAP_FAILED),

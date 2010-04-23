@@ -2,7 +2,8 @@
 **
 ** Copyright (C) 2008, The Android Open Source Project
 ** Copyright (C) 2008 HTC Inc.
-**
+** Copyright (c) 2009, Code Aurora Forum. All rights reserved.
+** 
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
 ** You may obtain a copy of the License at
@@ -133,7 +134,8 @@ private:
                     status_t    checkPid();
 
         static      void        recordingCallback(nsecs_t timestamp, const sp<IMemory>& mem, void* user);
-        static      void        previewCallback(const sp<IMemory>& mem, void* user);
+        //static      void        previewCallback(const sp<IMemory>& mem, void* user);
+	static      void        previewCallback(const sp<IMemory>& mem, int index, void* user);
         static      void        shutterCallback(void *user);
         static      void        yuvPictureCallback(const sp<IMemory>& mem, void* user);
         static      void        jpegPictureCallback(const sp<IMemory>& mem, void* user);
@@ -143,7 +145,9 @@ private:
                     void        postShutter();
                     void        postRaw(const sp<IMemory>& mem);
                     void        postJpeg(const sp<IMemory>& mem);
-                    void        postPreviewFrame(const sp<IMemory>& mem);
+                    //void        postPreviewFrame(const sp<IMemory>& mem);
+		    void postPreviewFrame(const sp<IMemory>& mem, int index);
+
                     void        postRecordingFrame(nsecs_t timestamp, const sp<IMemory>& frame);
                     void        copyFrameAndPostCopiedFrame(sp<IMemoryHeap> heap, size_t offset, size_t size);
                     void        postError(status_t error);

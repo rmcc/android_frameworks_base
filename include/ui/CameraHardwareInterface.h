@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
+ * Copyright (c) 2009, Code Aurora Forum. All rights reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,7 +25,7 @@
 namespace android {
 
 /** Callback for startPreview() */
-typedef void (*preview_callback)(const sp<IMemory>& mem, void* user);
+typedef void (*preview_callback)(const sp<IMemory>& mem, int index, void* user);
 
 /** Callback for startRecord() */
 typedef void (*recording_callback)(nsecs_t timestamp, const sp<IMemory>& mem, void* user);
@@ -86,6 +86,7 @@ public:
 
     /** Return the IMemoryHeap for the preview image heap */
     virtual sp<IMemoryHeap>         getPreviewHeap() const = 0;
+    virtual sp<IMemoryHeap>         getPreviewHeapnew(int i) const = 0;
 
     /** Return the IMemoryHeap for the raw image heap */
     virtual sp<IMemoryHeap>         getRawHeap() const = 0;

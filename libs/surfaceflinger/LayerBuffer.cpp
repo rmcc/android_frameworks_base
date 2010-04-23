@@ -283,9 +283,16 @@ LayerBuffer::Buffer::Buffer(const ISurface::BufferHeap& buffers, ssize_t offset)
     src.img.w = buffers.hor_stride ?: buffers.w;
     src.img.h = buffers.ver_stride ?: buffers.h;
     src.img.format = buffers.format;
-    src.img.offset = offset;
-    src.img.base   = buffers.heap->base();
-    src.img.fd     = buffers.heap->heapID();
+    if (buffers.htype == SINGLE_HEAP) {
+        src.img.offset = offset;
+        src.img.base   = buffers.heap->base();
+        src.img.fd     = buffers.heap->heapID();
+    }
+    else {
+        src.img.offset = 0;
+        src.img.base   = buffers.heaps[offset]->base();
+        src.img.fd     = buffers.heaps[offset]->heapID();
+    }
 }
 
 LayerBuffer::Buffer::~Buffer()
@@ -326,7 +333,8 @@ LayerBuffer::BufferSource::BufferSource(LayerBuffer& layer,
     : Source(layer), mStatus(NO_ERROR), 
       mBufferSize(0), mTextureName(-1U)
 {
-    if (buffers.heap == NULL) {
+    if (((buffers.htype == SINGLE_HEAP) && (buffers.heap == NULL)) ||
+        ((buffers.htype == MULTI_HEAP) && (buffers.heaps[0] == NULL))) {
         // this is allowed, but in this case, it is illegal to receive
         // postBuffer(). The surface just erases the framebuffer with
         // fully transparent pixels.
@@ -335,7 +343,13 @@ LayerBuffer::BufferSource::BufferSource(LayerBuffer& layer,
         return;
     }
 
-    status_t err = (buffers.heap->heapID() >= 0) ? NO_ERROR : NO_INIT;
+    status_t err;
+    if (buffers.htype == SINGLE_HEAP) {
+        err = (buffers.heap->heapID() >= 0) ? NO_ERROR : NO_INIT;
+    }
+    else {
+        err = (buffers.heaps[0]->heapID() >= 0) ? NO_ERROR : NO_INIT;
+    }
     if (err != NO_ERROR) {
         LOGE("LayerBuffer::BufferSource: invalid heap (%s)", strerror(err));
         mStatus = err;
@@ -363,7 +377,6 @@ LayerBuffer::BufferSource::BufferSource(LayerBuffer& layer,
     mLayer.setNeedsBlending((info.h_alpha - info.l_alpha) > 0);    
     mBufferSize = info.getScanlineSize(buffers.hor_stride)*buffers.ver_stride;
     mLayer.forceVisibilityTransaction();
-    
 }
 
 LayerBuffer::BufferSource::~BufferSource()
@@ -379,19 +392,31 @@ void LayerBuffer::BufferSource::postBuffer(ssize_t offset)
     { // scope for the lock
         Mutex::Autolock _l(mLock);
         buffers = mBufferHeap;
-        if (buffers.heap != 0) {
-            const size_t memorySize = buffers.heap->getSize();
-            if ((size_t(offset) + mBufferSize) > memorySize) {
-                LOGE("LayerBuffer::BufferSource::postBuffer() "
-                     "invalid buffer (offset=%d, size=%d, heap-size=%d",
-                     int(offset), int(mBufferSize), int(memorySize));
-                return;
+        if (buffers.htype == MULTI_HEAP)
+            if (buffers.heaps[offset] != 0) {
+                const size_t memorySize = buffers.heaps[offset]->getSize();
+                if (mBufferSize > memorySize) {
+                    LOGE("LayerBuffer::BufferSource::postBuffer() "
+                         "invalid buffer (offset=%d, size=%d, heap-size=%d",
+                         int(offset), int(mBufferSize), int(memorySize));
+                    return;
+                }
             }
-        }
+        else
+            if (buffers.heap != 0) {
+                const size_t memorySize = buffers.heap->getSize();
+                if (mBufferSize > memorySize) {
+                    LOGE("LayerBuffer::BufferSource::postBuffer() "
+                         "invalid buffer (offset=%d, size=%d, heap-size=%d",
+                         int(offset), int(mBufferSize), int(memorySize));
+                    return;
+                }
+            }
     }
 
     sp<Buffer> buffer;
-    if (buffers.heap != 0) {
+    if (((buffers.htype == MULTI_HEAP) && (buffers.heaps[offset] != 0)) ||
+        ((buffers.htype == SINGLE_HEAP) && (buffers.heap != 0))) {
         buffer = new LayerBuffer::Buffer(buffers, offset);
         if (buffer->getStatus() != NO_ERROR)
             buffer.clear();
@@ -491,6 +516,7 @@ void LayerBuffer::BufferSource::onDraw(const Region& clip) const
                 copybit->set_parameter(copybit, COPYBIT_TRANSFORM, 0);
                 copybit->set_parameter(copybit, COPYBIT_PLANE_ALPHA, 0xFF);
                 copybit->set_parameter(copybit, COPYBIT_DITHER, COPYBIT_DISABLE);
+		LOGD("copybit stretch layerbuffer");
                 err = copybit->stretch(copybit,
                         &tmp.img, &src.img, &tmp.crop, &src.crop, &tmp_it);
                 src = tmp;

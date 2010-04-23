@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
+ * Copyright (c) 2009, Code Aurora Forum. All rights reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,7 +29,18 @@
 
 namespace android {
 
+/* Warning: The numbers of buffers needs to be consistent among Camera driver,
+ * HAL, encoder, and PV. Do not change this without making equivalent changes
+ * in the other modules.
+ */
+#define NUM_SF_BUFFERS 4
+
 typedef int32_t    SurfaceID;
+
+enum {
+    SINGLE_HEAP,
+    MULTI_HEAP
+};
 
 class IMemoryHeap;
 class OverlayRef;
@@ -65,6 +76,12 @@ public:
                 PixelFormat format, uint32_t transform, uint32_t flags,
                 const sp<IMemoryHeap>& heap);
         
+        BufferHeap(uint32_t w, uint32_t h,
+                int32_t hor_stride, int32_t ver_stride,
+                PixelFormat format, uint32_t transform, uint32_t flags,
+                const sp<IMemoryHeap>& heap, const sp<IMemoryHeap>& heap,
+                const sp<IMemoryHeap>& heap, const sp<IMemoryHeap>& heap);
+
         ~BufferHeap(); 
         
         uint32_t w;
@@ -74,7 +91,9 @@ public:
         PixelFormat format;
         uint32_t transform;
         uint32_t flags;
+        uint32_t htype;
         sp<IMemoryHeap> heap;
+        sp<IMemoryHeap> heaps[NUM_SF_BUFFERS];
     };
     
     virtual status_t registerBuffers(const BufferHeap& buffers) = 0;

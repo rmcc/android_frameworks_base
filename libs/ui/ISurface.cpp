@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- *
+ * Copyright (c) 2009, Code Aurora Forum. All rights reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,7 @@ ISurface::BufferHeap::BufferHeap()
     : w(0), h(0), hor_stride(0), ver_stride(0), format(0),
     transform(0), flags(0) 
 {     
+    htype = SINGLE_HEAP;
 }
 
 ISurface::BufferHeap::BufferHeap(uint32_t w, uint32_t h,
@@ -39,6 +40,7 @@ ISurface::BufferHeap::BufferHeap(uint32_t w, uint32_t h,
     : w(w), h(h), hor_stride(hor_stride), ver_stride(ver_stride),
       format(format), transform(0), flags(0), heap(heap) 
 {
+    htype = SINGLE_HEAP;
 }
 
 ISurface::BufferHeap::BufferHeap(uint32_t w, uint32_t h,
@@ -46,10 +48,25 @@ ISurface::BufferHeap::BufferHeap(uint32_t w, uint32_t h,
         PixelFormat format, uint32_t transform, uint32_t flags,
         const sp<IMemoryHeap>& heap)
         : w(w), h(h), hor_stride(hor_stride), ver_stride(ver_stride),
-          format(format), transform(transform), flags(flags), heap(heap) 
+          format(format), transform(transform), flags(flags), heap(heap)
 {
+    htype = SINGLE_HEAP;
 }
 
+ISurface::BufferHeap::BufferHeap(uint32_t w, uint32_t h,
+        int32_t hor_stride, int32_t ver_stride,
+        PixelFormat format, uint32_t transform, uint32_t flags,
+        const sp<IMemoryHeap>& heap0, const sp<IMemoryHeap>& heap1,
+        const sp<IMemoryHeap>& heap2, const sp<IMemoryHeap>& heap3)
+        : w(w), h(h), hor_stride(hor_stride), ver_stride(ver_stride),
+          format(format), transform(transform), flags(flags)
+{
+    heaps[0] = heap0;
+    heaps[1] = heap1;
+    heaps[2] = heap2;
+    heaps[3] = heap3;
+    htype = MULTI_HEAP;
+}
 
 ISurface::BufferHeap::~BufferHeap() 
 {     
@@ -74,7 +91,15 @@ public:
         data.writeInt32(buffers.format);
         data.writeInt32(buffers.transform);
         data.writeInt32(buffers.flags);
-        data.writeStrongBinder(buffers.heap->asBinder());
+        data.writeInt32(buffers.htype);
+        if (buffers.htype == MULTI_HEAP)
+            for (int i = 0; i < NUM_SF_BUFFERS; i++) {
+                data.writeStrongBinder(buffers.heaps[i]->asBinder());
+                if(buffers.heaps[i] == NULL)
+                    LOGI("bad multi buffer %d", i);
+            }
+        else
+                data.writeStrongBinder(buffers.heap->asBinder());
         remote()->transact(REGISTER_BUFFERS, data, &reply);
         status_t result = reply.readInt32();
         return result;
@@ -132,7 +157,13 @@ status_t BnSurface::onTransact(
             buffer.format = data.readInt32();
             buffer.transform = data.readInt32();
             buffer.flags = data.readInt32();
-            buffer.heap = interface_cast<IMemoryHeap>(data.readStrongBinder());
+            buffer.htype = data.readInt32();
+            if (buffer.htype == MULTI_HEAP)
+                for (int i = 0; i < NUM_SF_BUFFERS; i++) {
+                    buffer.heaps[i] = interface_cast<IMemoryHeap>(data.readStrongBinder());
+                }
+            else
+                buffer.heap = interface_cast<IMemoryHeap>(data.readStrongBinder());
             status_t err = registerBuffers(buffer);
             reply->writeInt32(err);
             return NO_ERROR;

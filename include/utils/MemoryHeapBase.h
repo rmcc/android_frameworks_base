@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- *
+ * Copyright (c) 2009, Code Aurora Forum. All rights reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,6 +39,11 @@ public:
     };
 
     /* 
+     * Uses pre-existing buffer (base) instead of mapping locally
+     */
+    MemoryHeapBase(int fd, size_t size, void *base);
+
+    /* 
      * maps the memory referenced by fd. but DOESN'T take ownership
      * of the filedescriptor (it makes a copy with dup()
      */
@@ -63,6 +68,7 @@ public:
     virtual uint32_t    getFlags() const;
 
     const char*         getDevice() const;
+    void                setIndex(int index);
     
     /* this closes this heap -- use carefully */
     void dispose();
@@ -84,6 +90,7 @@ protected:
 private:
     status_t mapfd(int fd, size_t size);
 
+    int         mIndex;
     int         mFD;
     size_t      mSize;
     void*       mBase;
