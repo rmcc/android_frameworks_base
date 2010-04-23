@@ -83,6 +83,8 @@ public class ServiceState implements Parcelable {
     public static final int RADIO_TECHNOLOGY_EVDO_0 = 7;
     /** @hide */
     public static final int RADIO_TECHNOLOGY_EVDO_A = 8;
+    /** @hide */
+    public static final int RADIO_TECHNOLOGY_HSPA = 9;
 
     /**
      * Available registration states for GSM, UMTS and CDMA.

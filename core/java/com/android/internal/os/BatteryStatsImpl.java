@@ -1159,6 +1159,7 @@ public final class BatteryStatsImpl extends BatteryStats {
                     bin = DATA_CONNECTION_GPRS;
                     break;
                 case TelephonyManager.NETWORK_TYPE_UMTS:
+                case TelephonyManager.NETWORK_TYPE_HSPA:
                     bin = DATA_CONNECTION_UMTS;
                     break;
                 default:

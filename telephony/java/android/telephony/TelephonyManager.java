@@ -378,6 +378,8 @@ public class TelephonyManager {
     public static final int NETWORK_TYPE_EVDO_A = 6;
     /** Current network is 1xRTT*/
     public static final int NETWORK_TYPE_1xRTT = 7;
+    /** Current network is HSPA */
+    public static final int NETWORK_TYPE_HSPA = 8;
 
     /**
      * Returns a constant indicating the radio technology (network type)
@@ -403,6 +405,9 @@ public class TelephonyManager {
         }
         else if ("UMTS".equals(prop)) {
             return NETWORK_TYPE_UMTS;
+        }
+        else if ("HSPA".equals(prop)) {
+            return NETWORK_TYPE_HSPA;
         }
         else if ("CDMA".equals(prop)) {
             return NETWORK_TYPE_CDMA;
@@ -436,6 +441,8 @@ public class TelephonyManager {
                 return "EDGE";
             case NETWORK_TYPE_UMTS:
                 return "UMTS";
+            case NETWORK_TYPE_HSPA:
+                return "HSPA";
             case NETWORK_TYPE_CDMA:
                 return "CDMA";
             case NETWORK_TYPE_EVDO_0:

@@ -44,6 +44,9 @@ public abstract class ServiceStateTracker extends Handler {
     protected static final int DATA_ACCESS_CDMA_1xRTT = 6;
     protected static final int DATA_ACCESS_CDMA_EvDo_0 = 7;
     protected static final int DATA_ACCESS_CDMA_EvDo_A = 8;
+    protected static final int DATA_ACCESS_HSPA = 9;
+
+
     //***** Instance Variables
 
     protected CommandsInterface cm;
