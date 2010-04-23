@@ -114,6 +114,8 @@ static const KeycodeLabel KEYCODES[] = {
     { "MEDIA_REWIND", 89 },
     { "MEDIA_FAST_FORWARD", 90 },
     { "MUTE", 91 },
+    { "VOBIS_X", 99 },
+    { "VOBIS_B", 100 },
 
     // NOTE: If you add a new keycode here you must also add it to:
     //   (enum KeyCode, in this file)
