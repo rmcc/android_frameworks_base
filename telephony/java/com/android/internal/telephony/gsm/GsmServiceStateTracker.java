@@ -569,6 +569,10 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
         String spn = phone.mSIMRecords.getServiceProviderName();
         String plmn = ss.getOperatorAlphaLong();
 
+        if (TextUtils.equals(spn, "")) {
+		spn = ss.getOperatorAlphaShort();
+	}
+
         if (rule != curSpnRule
                 || !TextUtils.equals(spn, curSpn)
                 || !TextUtils.equals(plmn, curPlmn)) {
@@ -576,6 +580,10 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
                 (rule & SIMRecords.SPN_RULE_SHOW_SPN) == SIMRecords.SPN_RULE_SHOW_SPN;
             boolean showPlmn =
                 (rule & SIMRecords.SPN_RULE_SHOW_PLMN) == SIMRecords.SPN_RULE_SHOW_PLMN;
+            if (!TextUtils.equals(spn, "") && spn != null && showSpn) {
+            	showPlmn = false;
+	    }
+
             Intent intent = new Intent(Intents.SPN_STRINGS_UPDATED_ACTION);
             intent.putExtra(Intents.EXTRA_SHOW_SPN, showSpn);
             intent.putExtra(Intents.EXTRA_SPN, spn);
@@ -807,6 +815,9 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
                 break;
             case DATA_ACCESS_UMTS:
                 ret = "UMTS";
+                break;
+            case DATA_ACCESS_HSPA:
+                ret = "HSPA";
                 break;
             default:
                 Log.e(LOG_TAG, "Wrong network type: " + Integer.toString(type));
