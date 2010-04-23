@@ -38,6 +38,7 @@ import android.os.PowerManager;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.util.Config;
 import android.util.Log;
 import android.util.SparseIntArray;
@@ -384,7 +385,8 @@ public class GpsLocationProvider extends ILocationProvider.Stub {
      * data network (e.g., the Internet), false otherwise.
      */
     public boolean requiresNetwork() {
-        return true;
+        // RCMod return true;
+        return false;
     }
 
     public void updateNetworkState(int state) {
@@ -722,6 +724,13 @@ public class GpsLocationProvider extends ILocationProvider.Stub {
         if (!mStarted) {
             if (DEBUG) Log.d(TAG, "startNavigating");
             mStarted = true;
+            if (Settings.Secure.getInt(mContext.getContentResolver(),
+                    Settings.Secure.ASSISTED_GPS_ENABLED, 1) != 0) {
+                mPositionMode = GPS_POSITION_MODE_MS_BASED;
+            } else {
+                mPositionMode = GPS_POSITION_MODE_STANDALONE;
+            }
+
             if (!native_start(mPositionMode, false, mFixInterval)) {
                 mStarted = false;
                 Log.e(TAG, "native_start failed in startNavigating()");
@@ -1002,6 +1011,34 @@ public class GpsLocationProvider extends ILocationProvider.Stub {
         }
     }
 
+    /**
+     * called from native code to report NMEA data received
+     */
+    private void reportNmea(int index, long timestamp) {
+	return;
+		/* Must finish backporting NMEA support... 
+        synchronized(mListeners) {
+            int size = mListeners.size();
+            if (size > 0) {
+                // don't bother creating the String if we have no listeners
+                int length = native_read_nmea(index, mNmeaBuffer, mNmeaBuffer.length);
+                String nmea = new String(mNmeaBuffer, 0, length);
+
+                for (int i = 0; i < size; i++) {
+                    Listener listener = mListeners.get(i);
+                    try {
+                        listener.mListener.onNmeaReceived(timestamp, nmea);
+                    } catch (RemoteException e) {
+                        Log.w(TAG, "RemoteException in reportNmea");
+                        mListeners.remove(listener);
+                        // adjust for size of list changing
+                        size--;
+                    }
+                } 
+            }
+        }*/
+    }
+
     private void xtraDownloadRequest() {
         if (Config.LOGD) Log.d(TAG, "xtraDownloadRequest");
         if (mNetworkThread != null) {
@@ -1182,6 +1219,8 @@ public class GpsLocationProvider extends ILocationProvider.Stub {
     private float mSvAzimuths[] = new float[MAX_SVS];
     private int mSvMasks[] = new int[3];
     private int mSvCount;
+    // preallocated to avoid memory allocation in reportNmea()
+    private byte[] mNmeaBuffer = new byte[120];
 
     static { class_init_native(); }
     private static native void class_init_native();
@@ -1199,6 +1238,7 @@ public class GpsLocationProvider extends ILocationProvider.Stub {
     // mask[0] is ephemeris mask and mask[1] is almanac mask
     private native int native_read_sv_status(int[] svs, float[] snrs,
             float[] elevations, float[] azimuths, int[] masks);
+    private native int native_read_nmea(int index, byte[] buffer, int bufferSize);
     private native void native_inject_location(double latitude, double longitude, float accuracy);
 
     // XTRA Support    

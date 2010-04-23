@@ -1438,6 +1438,8 @@ public final class Settings {
         @Deprecated
         public static final String INSTALL_NON_MARKET_APPS = Secure.INSTALL_NON_MARKET_APPS;
 
+        /** @hide **/
+        public static final String ASSISTED_GPS_ENABLED = Secure.ASSISTED_GPS_ENABLED;
         /**
          * @deprecated Use {@link android.provider.Settings.Secure#LOCATION_PROVIDERS_ALLOWED}
          * instead
@@ -2280,6 +2282,13 @@ public final class Settings {
          * @hide
          */
         public static final String USE_LOCATION_FOR_SERVICES = "use_location";
+
+        /**
+ *          * Whether assisted GPS should be enabled or not.
+ *                            
+         @hide **/
+        public static final String ASSISTED_GPS_ENABLED = "assisted_gps_enabled";
+
 
         /**
          * Controls whether settings backup is enabled.
