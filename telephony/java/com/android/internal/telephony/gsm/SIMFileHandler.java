@@ -53,9 +53,12 @@ public final class SIMFileHandler extends IccFileHandler implements IccConstants
     }
 
     protected String getEFPath(int efid) {
+	// RCMod: compat with old libril-qc-1
+	return null;
         // TODO(): Make changes when USIM is supported
         // TODO(): DF_GSM can be 7F20 or 7F21 to handle backward compatibility.
         // Implement this after discussion with OEMs.
+        /* RCMod comment out
         switch(efid) {
         case EF_SMS:
             return MF_SIM + DF_TELECOM;
@@ -80,7 +83,7 @@ public final class SIMFileHandler extends IccFileHandler implements IccConstants
         case EF_INFO_CPHS:
             return MF_SIM + DF_GSM;
         }
-        return getCommonIccEFPath(efid);
+        return getCommonIccEFPath(efid);*/
     }
 
     protected void logd(String msg) {
