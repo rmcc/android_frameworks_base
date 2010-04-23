@@ -1027,6 +1027,10 @@ public final class SimulatedCommands extends BaseCommands
         resultSuccess(result, null);
     }
 
+    public void setStkProfile(Message result) {
+        unimplemented(result);
+    }
+
     private boolean isSimLocked() {
         if (mSimLockedState != SimLockState.NONE) {
             return true;

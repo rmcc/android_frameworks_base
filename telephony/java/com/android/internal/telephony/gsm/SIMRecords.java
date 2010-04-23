@@ -59,7 +59,7 @@ public final class SIMRecords extends IccRecords {
 
     private static final boolean CRASH_RIL = false;
 
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     //***** Instance Variables
 

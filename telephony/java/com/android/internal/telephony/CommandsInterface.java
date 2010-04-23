@@ -1167,6 +1167,8 @@ public interface CommandsInterface {
      */
     void reportStkServiceIsRunning(Message result);
 
+    void setStkProfile(Message result);
+
     void invokeOemRilRequestRaw(byte[] data, Message response);
 
     void invokeOemRilRequestStrings(String[] strings, Message response);
