@@ -193,7 +193,9 @@ void DisplayHardware::init(uint32_t dpy)
      * except if it is overriden by qemu.sf.lcd_density.
      */
     if (property_get("qemu.sf.lcd_density", property, NULL) <= 0) {
-        if (property_get("ro.sf.lcd_density", property, NULL) <= 0) {
+        if (property_get("persist.gp1.sf.lcd_density", property, NULL) > 0) {
+            LOGW("persist.gp1.sf.lcd_density override has been specified as %s.",property);
+        } else if (property_get("ro.sf.lcd_density", property, NULL) <= 0) {
             LOGW("ro.sf.lcd_density not defined, using 160 dpi by default.");
             strcpy(property, "160");
         }
