@@ -1851,6 +1851,17 @@ public final class RIL extends BaseCommands implements CommandsInterface {
         send(rr);
     }
 
+    /* Ugly qualcomm RIL hack. STK needs to be raised for the radio to
+     * boot up properly, even if it's with an error! */
+    public void setStkProfile(Message result) {
+        RILRequest rr = RILRequest.obtain(RIL_REQUEST_STK_SET_PROFILE, result);
+	rr.mp.writeString("supported");
+
+        if (RILJ_LOGD) riljLog(rr.serialString() + "> " + requestToString(rr.mRequest));
+
+        send(rr);
+    }
+
     /**
      * {@inheritDoc}
      */
