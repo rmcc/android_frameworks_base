@@ -261,34 +261,52 @@ sp<OverlayRef> LayerBuffer::SurfaceLayerBuffer::createOverlay(
 // ============================================================================
 
 LayerBuffer::Buffer::Buffer(const ISurface::BufferHeap& buffers, ssize_t offset)
-    : mBufferHeap(buffers)
+: mBufferHeap(buffers)
 {
-    NativeBuffer& src(mNativeBuffer);
-    src.crop.l = 0;
-    src.crop.t = 0;
-    src.crop.r = buffers.w;
-    src.crop.b = buffers.h;
+	NativeBuffer& src(mNativeBuffer);
+	src.crop.l = 0;
+	src.crop.t = 0;
+	src.crop.r = buffers.w;
+	src.crop.b = buffers.h;
 
-    src.img.w       = buffers.hor_stride ?: buffers.w;
-    src.img.h       = buffers.ver_stride ?: buffers.h;
-    src.img.format  = buffers.format;
-    src.img.base    = (void*)(intptr_t(buffers.heap->base()) + offset);
-    src.img.handle  = 0;
+	src.img.w       = buffers.hor_stride ?: buffers.w;
+	src.img.h       = buffers.ver_stride ?: buffers.h;
+	src.img.format  = buffers.format;
+	if (buffers.htype == SINGLE_HEAP) {
+		src.img.base    = (void*)(intptr_t(buffers.heap->base()) + offset);
+		src.img.handle  = 0;
+	} else {
+		src.img.base    = (void*)(intptr_t(buffers.heaps[offset]->base()));
+		src.img.handle  = 0;
+	}
 
-    gralloc_module_t const * module = LayerBuffer::getGrallocModule();
-    if (module && module->perform) {
-        int err = module->perform(module,
-                GRALLOC_MODULE_PERFORM_CREATE_HANDLE_FROM_BUFFER,
-                buffers.heap->heapID(), buffers.heap->getSize(),
-                offset, buffers.heap->base(),
-                &src.img.handle);
+	gralloc_module_t const * module = LayerBuffer::getGrallocModule();
+	if (module && module->perform) {
+		if (buffers.htype == SINGLE_HEAP) {
+			int err = module->perform(module,
+					GRALLOC_MODULE_PERFORM_CREATE_HANDLE_FROM_BUFFER,
+					buffers.heap->heapID(), buffers.heap->getSize(),
+					offset, buffers.heap->base(),
+					&src.img.handle);
 
-        LOGE_IF(err, "CREATE_HANDLE_FROM_BUFFER (heapId=%d, size=%d, "
-             "offset=%ld, base=%p) failed (%s)",
-                buffers.heap->heapID(), buffers.heap->getSize(),
-                offset, buffers.heap->base(), strerror(-err));
-    }
- }
+			LOGE_IF(err, "CREATE_HANDLE_FROM_BUFFER (heapId=%d, size=%d, "
+					"offset=%ld, base=%p) failed (%s)",
+					buffers.heap->heapID(), buffers.heap->getSize(),
+					offset, buffers.heap->base(), strerror(-err));
+		} else {
+			int err = module->perform(module,
+					GRALLOC_MODULE_PERFORM_CREATE_HANDLE_FROM_BUFFER,
+					buffers.heaps[offset]->heapID(), buffers.heaps[offset]->getSize(),
+					0, buffers.heaps[offset]->base(),
+					&src.img.handle);
+
+			LOGE_IF(err, "CREATE_HANDLE_FROM_BUFFER (MULTIHEAP) (heapId=%d, size=%d, "
+					"offset=%ld, base=%p) failed (%s)",
+					buffers.heaps[offset]->heapID(), buffers.heaps[offset]->getSize(),
+					0, buffers.heaps[offset]->base(), strerror(-err));
+		}
+	}
+}
 
 LayerBuffer::Buffer::~Buffer()
 {
@@ -331,7 +349,9 @@ LayerBuffer::BufferSource::BufferSource(LayerBuffer& layer,
         const ISurface::BufferHeap& buffers)
     : Source(layer), mStatus(NO_ERROR), mBufferSize(0)
 {
-    if (buffers.heap == NULL) {
+
+    if (((buffers.htype == SINGLE_HEAP) && (buffers.heap == NULL)) ||
+        ((buffers.htype == MULTI_HEAP) && (buffers.heaps[0] == NULL))) {
         // this is allowed, but in this case, it is illegal to receive
         // postBuffer(). The surface just erases the framebuffer with
         // fully transparent pixels.
@@ -340,7 +360,13 @@ LayerBuffer::BufferSource::BufferSource(LayerBuffer& layer,
         return;
     }
 
-    status_t err = (buffers.heap->heapID() >= 0) ? NO_ERROR : NO_INIT;
+    status_t err;
+    if (buffers.htype == SINGLE_HEAP) {
+        err = (buffers.heap->heapID() >= 0) ? NO_ERROR : NO_INIT;
+    }
+    else {
+        err = (buffers.heaps[0]->heapID() >= 0) ? NO_ERROR : NO_INIT;
+    }
     if (err != NO_ERROR) {
         LOGE("LayerBuffer::BufferSource: invalid heap (%s)", strerror(err));
         mStatus = err;
@@ -387,19 +413,31 @@ void LayerBuffer::BufferSource::postBuffer(ssize_t offset)
     { // scope for the lock
         Mutex::Autolock _l(mBufferSourceLock);
         buffers = mBufferHeap;
-        if (buffers.heap != 0) {
-            const size_t memorySize = buffers.heap->getSize();
-            if ((size_t(offset) + mBufferSize) > memorySize) {
-                LOGE("LayerBuffer::BufferSource::postBuffer() "
-                     "invalid buffer (offset=%d, size=%d, heap-size=%d",
-                     int(offset), int(mBufferSize), int(memorySize));
-                return;
+        if (buffers.htype == MULTI_HEAP)
+            if (buffers.heaps[offset] != 0) {
+                const size_t memorySize = buffers.heaps[offset]->getSize();
+                if (mBufferSize > memorySize) {
+                    LOGE("LayerBuffer::BufferSource::postBuffer() "
+                         "invalid buffer (offset=%d, size=%d, heap-size=%d",
+                         int(offset), int(mBufferSize), int(memorySize));
+                    return;
+                }
             }
-        }
+        else
+            if (buffers.heap != 0) {
+                const size_t memorySize = buffers.heap->getSize();
+                if (mBufferSize > memorySize) {
+                    LOGE("LayerBuffer::BufferSource::postBuffer() "
+                         "invalid buffer (offset=%d, size=%d, heap-size=%d",
+                         int(offset), int(mBufferSize), int(memorySize));
+                    return;
+                }
+            }
     }
 
     sp<Buffer> buffer;
-    if (buffers.heap != 0) {
+    if (((buffers.htype == MULTI_HEAP) && (buffers.heaps[offset] != 0)) ||
+        ((buffers.htype == SINGLE_HEAP) && (buffers.heap != 0))) {
         buffer = new LayerBuffer::Buffer(buffers, offset);
         if (buffer->getStatus() != NO_ERROR)
             buffer.clear();

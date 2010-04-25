@@ -40,6 +40,13 @@ namespace android {
 
 // ---------------------------------------------------------------------------
 
+MemoryHeapBase::MemoryHeapBase(int fd, size_t size, void *base)
+    : mFD(fd), mSize(size), mBase(base),
+      mDevice(NULL), mNeedUnmap(false)
+{
+}
+
+
 MemoryHeapBase::MemoryHeapBase() 
     : mFD(-1), mSize(0), mBase(MAP_FAILED),
       mDevice(NULL), mNeedUnmap(false) 

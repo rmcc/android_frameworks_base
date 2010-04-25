@@ -221,6 +221,7 @@ CameraService::Client::Client(const sp<CameraService>& cameraService,
 
     mHardware->setCallbacks(notifyCallback,
                             dataCallback,
+                            dataIndexedCallback,
                             dataCallbackTimestamp,
                             mCameraService.get());
 
@@ -612,7 +613,12 @@ status_t CameraService::Client::registerPreviewBuffers()
                                  PIXEL_FORMAT_YCbCr_420_SP,
                                  transform,
                                  0,
-                                 mHardware->getPreviewHeap());
+                                 /*mHardware->getPreviewHeap());*/
+                                 mHardware->getPreviewHeapnew(0),
+                                 mHardware->getPreviewHeapnew(1),
+                                 mHardware->getPreviewHeapnew(2),
+                                 mHardware->getPreviewHeapnew(3));
+
 
     status_t ret = mSurface->registerBuffers(buffers);
     if (ret != NO_ERROR) {
@@ -943,7 +949,7 @@ void CameraService::Client::handleShutter(
 }
 
 // preview callback - frame buffer update
-void CameraService::Client::handlePreviewData(const sp<IMemory>& mem)
+void CameraService::Client::handlePreviewData(const sp<IMemory>& mem, int index)
 {
     ssize_t offset;
     size_t size;
@@ -971,7 +977,7 @@ void CameraService::Client::handlePreviewData(const sp<IMemory>& mem)
     {
         Mutex::Autolock surfaceLock(mSurfaceLock);
         if (mSurface != NULL) {
-            mSurface->postBuffer(offset);
+            mSurface->postBuffer(index);
         }
     }
 
@@ -1127,8 +1133,55 @@ void CameraService::Client::dataCallback(int32_t msgType, const sp<IMemory>& dat
     }
 
     switch (msgType) {
-        case CAMERA_MSG_PREVIEW_FRAME:
+        /*case CAMERA_MSG_PREVIEW_FRAME:
             client->handlePreviewData(dataPtr);
+            break;*/
+        case CAMERA_MSG_POSTVIEW_FRAME:
+            client->handlePostview(dataPtr);
+            break;
+        case CAMERA_MSG_RAW_IMAGE:
+            client->handleRawPicture(dataPtr);
+            break;
+        case CAMERA_MSG_COMPRESSED_IMAGE:
+            client->handleCompressedPicture(dataPtr);
+            break;
+        default:
+            if (c != NULL) {
+                c->dataCallback(msgType, dataPtr);
+            }
+            break;
+    }
+
+#if DEBUG_CLIENT_REFERENCES
+    if (client->getStrongCount() == 1) {
+        LOGE("++++++++++++++++ (DATA CALLBACK) THIS WILL CAUSE A LOCKUP!");
+        client->printRefs();
+    }
+#endif
+}
+
+void CameraService::Client::dataIndexedCallback(int32_t msgType, const sp<IMemory>& dataPtr, int index,  void* user)
+{
+    LOGV("dataCallback(%d)", msgType);
+
+    sp<Client> client = getClientFromCookie(user);
+    if (client == 0) {
+        return;
+    }
+
+    sp<ICameraClient> c = client->mCameraClient;
+    if (dataPtr == NULL) {
+        LOGE("Null data returned in data callback");
+        if (c != NULL) {
+            c->notifyCallback(CAMERA_MSG_ERROR, UNKNOWN_ERROR, 0);
+            c->dataCallback(msgType, NULL);
+        }
+        return;
+    }
+
+    switch (msgType) {
+        case CAMERA_MSG_PREVIEW_FRAME:
+            client->handlePreviewData(dataPtr, index);
             break;
         case CAMERA_MSG_POSTVIEW_FRAME:
             client->handlePostview(dataPtr);

@@ -39,6 +39,12 @@ public:
         NO_CACHING = 0x00000200
     };
 
+    /*
+     * Uses pre-existing buffer (base) instead of mapping locally
+     */
+    MemoryHeapBase(int fd, size_t size, void *base);
+
+
     /* 
      * maps the memory referenced by fd. but DOESN'T take ownership
      * of the filedescriptor (it makes a copy with dup()
@@ -64,6 +70,7 @@ public:
     virtual uint32_t    getFlags() const;
 
     const char*         getDevice() const;
+    void                setIndex(int index);
     
     /* this closes this heap -- use carefully */
     void dispose();
@@ -85,6 +92,7 @@ protected:
 private:
     status_t mapfd(int fd, size_t size, uint32_t offset = 0);
 
+    int         mIndex;
     int         mFD;
     size_t      mSize;
     void*       mBase;
