@@ -94,6 +94,7 @@ class ServerThread extends Thread {
         BluetoothA2dpService bluetoothA2dp = null;
         HeadsetObserver headset = null;
         DockObserver dock = null;
+	RingerSwitchObserver ringer = null;
 
         // Critical services...
         try {
@@ -330,6 +331,14 @@ class ServerThread extends Thread {
             }
 
             try {
+                Log.i(TAG, "RingerSwitch Observer");
+                // Listen for hard ringer switch changes
+                ringer = new RingerSwitchObserver(context);
+            } catch (Throwable e) {
+                Log.e(TAG, "Failure starting RingerSwitchObserver", e);
+            }
+
+            try {
                 Log.i(TAG, "Dock Observer");
                 // Listen for dock station changes
                 dock = new DockObserver(context, power);
@@ -357,6 +366,7 @@ class ServerThread extends Thread {
             } catch (Throwable e) {
                 Log.e(TAG, "Failure installing status bar icons", e);
             }
+
         }
 
         // make sure the ADB_ENABLED setting value matches the secure property value
