@@ -217,6 +217,9 @@ public class WifiService extends IWifiManager.Stub {
                 }
         );
 
+
+        setWifiEnabledBlocking(wifiEnabled, false, Process.myUid());
+
         Log.i(TAG, "WifiService starting up with Wi-Fi " +
                 (wifiEnabled ? "enabled" : "disabled"));
 
@@ -230,8 +233,6 @@ public class WifiService extends IWifiManager.Stub {
                     }
                 },
                 new IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED));
-
-        setWifiEnabledBlocking(wifiEnabled, false, Process.myUid());
     }
 
     private boolean getPersistedWifiEnabled() {

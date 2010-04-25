@@ -1041,7 +1041,7 @@ public class WifiStateTracker extends NetworkStateTracker {
                  * the same access point occurs within a short time.
                  */
                 if (result.state == DetailedState.DISCONNECTED) {
-                    if (mWifiInfo.getSupplicantState() != SupplicantState.DORMANT) {
+                    if (mWifiInfo.getSupplicantState() != SupplicantState.DORMANT && mWifiInfo.getSupplicantState() != SupplicantState.ASSOCIATING ) {
                         scheduleDisconnect();
                     }
                     break;
@@ -1310,6 +1310,7 @@ public class WifiStateTracker extends NetworkStateTracker {
         }
 
         NetworkUtils.disableInterface(mInterfaceName);
+        NetworkUtils.enableInterface(mInterfaceName);
         // we no longer net to start the interface (driver does this for us)
         // and it led to problems - removed.
     }
@@ -1407,7 +1408,8 @@ public class WifiStateTracker extends NetworkStateTracker {
      */
     private synchronized void requestPolledInfo(WifiInfo info, boolean polling)
     {
-        int newRssi = (polling ? WifiNative.getRssiApproxCommand() : WifiNative.getRssiCommand());
+        //int newRssi = (polling ? WifiNative.getRssiApproxCommand() : WifiNative.getRssiCommand());
+        int newRssi = WifiNative.getRssiCommand();
         if (newRssi != -1 && -200 < newRssi && newRssi < 256) { // screen out invalid values
             /* some implementations avoid negative values by adding 256
              * so we need to adjust for that here.
