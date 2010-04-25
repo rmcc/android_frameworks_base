@@ -2199,6 +2199,11 @@ class PowerManagerService extends IPowerManager.Stub
                     }
                     userActivity(SystemClock.uptimeMillis(), false, BUTTON_EVENT, true);
                 }
+		// If hiding keyboard, turn off leds
+		if (!visible) {
+			mHardware.setHardKeyLights(58, 0);
+			mHardware.setHardKeyLights(59, 0);
+		}
             }
         }
     }
