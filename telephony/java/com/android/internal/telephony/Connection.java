@@ -50,6 +50,7 @@ public abstract class Connection {
         CS_RESTRICTED,                  /* call was blocked by restricted all voice access */
         CS_RESTRICTED_NORMAL,           /* call was blocked by restricted normal voice access */
         CS_RESTRICTED_EMERGENCY,        /* call was blocked by restricted emergency voice access */
+        UNOBTAINABLE_NUMBER,            /* Unassigned number (3GPP TS 24.008 table 10.5.123) */
         CDMA_LOCKED_UNTIL_POWER_CYCLE,  /* MS is locked until next power cycle */
         CDMA_DROP,
         CDMA_INTERCEPT,                 /* INTERCEPT order received, MS state idle entered */
@@ -271,6 +272,13 @@ public abstract class Connection {
      * @return one of PRESENTATION_*
      */
     public abstract int getNumberPresentation();
+
+    /**
+     * Returns the User to User Signaling (UUS) information associated with
+     * incoming and waiting calls
+     * @return UUSInfo containing the UUS userdata.
+     */
+    public abstract UUSInfo getUUSInfo();
 
     /**
      * Build a human representation of a connection instance, suitable for debugging.

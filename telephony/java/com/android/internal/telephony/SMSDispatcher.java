@@ -62,6 +62,7 @@ import static android.telephony.SmsManager.RESULT_ERROR_NO_SERVICE;
 import static android.telephony.SmsManager.RESULT_ERROR_NULL_PDU;
 import static android.telephony.SmsManager.RESULT_ERROR_RADIO_OFF;
 import static android.telephony.SmsManager.RESULT_ERROR_LIMIT_EXCEEDED;
+import static android.telephony.SmsManager.RESULT_ERROR_FDN_CHECK_FAILURE;
 
 
 public abstract class SMSDispatcher extends Handler {
@@ -109,6 +110,12 @@ public abstract class SMSDispatcher extends Handler {
     /** Stop the sending */
     static final protected int EVENT_STOP_SENDING = 10;
 
+    /** Memory status reporting is acknowledged by RIL */
+    static final protected int EVENT_REPORT_MEMORY_STATUS_DONE = 11;
+
+    /** Radio is ON */
+    static final protected int EVENT_RADIO_ON = 12;
+
     protected Phone mPhone;
     protected Context mContext;
     protected ContentResolver mResolver;
@@ -152,6 +159,7 @@ public abstract class SMSDispatcher extends Handler {
     private SmsMessageBase.SubmitPduBase mSubmitPduBase;
 
     protected boolean mStorageAvailable = true;
+    protected boolean mReportMemoryStatusPending = false;
 
     protected static int getNextConcatenatedRef() {
         sConcatenatedRef += 1;
@@ -235,6 +243,7 @@ public abstract class SMSDispatcher extends Handler {
         mCm.setOnNewSMS(this, EVENT_NEW_SMS, null);
         mCm.setOnSmsStatus(this, EVENT_NEW_SMS_STATUS_REPORT, null);
         mCm.setOnIccSmsFull(this, EVENT_ICC_FULL, null);
+        mCm.registerForOn(this, EVENT_RADIO_ON, null);
 
         // Don't always start message ref at 0.
         sConcatenatedRef = new Random().nextInt(256);
@@ -253,6 +262,7 @@ public abstract class SMSDispatcher extends Handler {
         mCm.unSetOnNewSMS(this);
         mCm.unSetOnSmsStatus(this);
         mCm.unSetOnIccSmsFull(this);
+        mCm.unregisterForOn(this);
     }
 
     protected void finalize() {
@@ -370,6 +380,26 @@ public abstract class SMSDispatcher extends Handler {
                 removeMessages(EVENT_ALERT_TIMEOUT, msg.obj);
             }
             break;
+
+        case EVENT_REPORT_MEMORY_STATUS_DONE:
+            ar = (AsyncResult)msg.obj;
+            if (ar.exception != null) {
+                mReportMemoryStatusPending = true;
+                Log.v(TAG, "Memory status report to modem pending : mStorageAvailable = "
+                        + mStorageAvailable);
+            } else {
+                mReportMemoryStatusPending = false;
+            }
+            break;
+
+        case EVENT_RADIO_ON:
+            if (mReportMemoryStatusPending) {
+                Log.v(TAG, "Sending pending memory status report : mStorageAvailable = "
+                        + mStorageAvailable);
+                mCm.reportSmsMemoryStatus(mStorageAvailable,
+                        obtainMessage(EVENT_REPORT_MEMORY_STATUS_DONE));
+            }
+            break;
         }
     }
 
@@ -470,13 +500,20 @@ public abstract class SMSDispatcher extends Handler {
                 Message retryMsg = obtainMessage(EVENT_SEND_RETRY, tracker);
                 sendMessageDelayed(retryMsg, SEND_RETRY_DELAY);
             } else if (tracker.mSentIntent != null) {
+                int error = RESULT_ERROR_GENERIC_FAILURE;
+
+                if (((CommandException)(ar.exception)).getCommandError()
+                        == CommandException.Error.FDN_CHECK_FAILURE) {
+                    error = RESULT_ERROR_FDN_CHECK_FAILURE;
+                }
                 // Done retrying; return an error to the app.
                 try {
                     Intent fillIn = new Intent();
                     if (ar.result != null) {
                         fillIn.putExtra("errorCode", ((SmsResponse)ar.result).errorCode);
                     }
-                    tracker.mSentIntent.send(mContext, RESULT_ERROR_GENERIC_FAILURE, fillIn);
+                    tracker.mSentIntent.send(mContext, error, fillIn);
+
                 } catch (CanceledException ex) {}
             }
         }
@@ -940,10 +977,10 @@ public abstract class SMSDispatcher extends Handler {
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals(Intent.ACTION_DEVICE_STORAGE_LOW)) {
                     mStorageAvailable = false;
-                    mCm.reportSmsMemoryStatus(false, null);
+                    mCm.reportSmsMemoryStatus(false, obtainMessage(EVENT_REPORT_MEMORY_STATUS_DONE));
                 } else if (intent.getAction().equals(Intent.ACTION_DEVICE_STORAGE_OK)) {
                     mStorageAvailable = true;
-                    mCm.reportSmsMemoryStatus(true, null);
+                    mCm.reportSmsMemoryStatus(true, obtainMessage(EVENT_REPORT_MEMORY_STATUS_DONE));
                 } else {
                     // Assume the intent is one of the SMS receive intents that
                     // was sent as an ordered broadcast.  Check result and ACK.

@@ -5202,7 +5202,7 @@ public class TextView extends View implements ViewTreeObserver.OnPreDrawListener
             mDesiredHeightAtMeasure = desired;
 
             if (heightMode == MeasureSpec.AT_MOST) {
-                height = Math.min(desired, height);
+                height = Math.min(desired, heightSize);
             }
         }
 
@@ -5731,6 +5731,7 @@ public class TextView extends View implements ViewTreeObserver.OnPreDrawListener
     /**
      * Convenience for {@link Selection#getSelectionStart}.
      */
+    @ViewDebug.ExportedProperty
     public int getSelectionStart() {
         return Selection.getSelectionStart(getText());
     }
@@ -5738,6 +5739,7 @@ public class TextView extends View implements ViewTreeObserver.OnPreDrawListener
     /**
      * Convenience for {@link Selection#getSelectionEnd}.
      */
+    @ViewDebug.ExportedProperty
     public int getSelectionEnd() {
         return Selection.getSelectionEnd(getText());
     }

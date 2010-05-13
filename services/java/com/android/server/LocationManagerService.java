@@ -552,10 +552,8 @@ public class LocationManagerService extends ILocationManager.Stub implements Run
         }
         // Use system settings
         ContentResolver resolver = mContext.getContentResolver();
-        String allowedProviders = Settings.Secure.getString(resolver,
-           Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
 
-        return ((allowedProviders != null) && (allowedProviders.contains(provider)));
+        return Settings.Secure.isLocationProviderEnabled(resolver, provider);
     }
 
     private void checkPermissionsSafe(String provider) {
@@ -1204,12 +1202,11 @@ public class LocationManagerService extends ILocationManager.Stub implements Run
             // Remove expired alerts
             if (intentsToRemove != null) {
                 for (PendingIntent i : intentsToRemove) {
-                    mProximityAlerts.remove(i);
                     ProximityAlert alert = mProximityAlerts.get(i);
                     mProximitiesEntered.remove(alert);
+                    removeProximityAlertLocked(i);
                 }
             }
-
         }
 
         // Note: this is called with the lock held.
@@ -1315,7 +1312,7 @@ public class LocationManagerService extends ILocationManager.Stub implements Run
 
     /**
      * @return null if the provider does not exits
-     * @throw SecurityException if the provider is not allowed to be
+     * @throws SecurityException if the provider is not allowed to be
      * accessed by the caller
      */
     public Bundle getProviderInfo(String provider) {
