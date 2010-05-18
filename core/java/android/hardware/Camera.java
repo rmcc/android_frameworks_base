@@ -685,6 +685,12 @@ public class Camera {
         private static final String KEY_SCENE_MODE = "scene-mode";
         private static final String KEY_FLASH_MODE = "flash-mode";
         private static final String KEY_FOCUS_MODE = "focus-mode";
+        private static final String KEY_SHARPNESS = "sharpness";
+        private static final String KEY_MAX_SHARPNESS = "max-sharpness";
+        private static final String KEY_CONTRAST = "contrast";
+        private static final String KEY_MAX_CONTRAST = "max-contrast";
+        private static final String KEY_SATURATION = "saturation";
+        private static final String KEY_MAX_SATURATION = "max-saturation";
         // Parameter key suffix for supported values.
         private static final String SUPPORTED_VALUES_SUFFIX = "-values";
 
@@ -1330,6 +1336,107 @@ public class Camera {
         }
 
 
+        /**
+         * Get Sharpness level
+         *
+         * @return sharpness level
+         * @hide
+         */
+        public int getSharpness(){
+            return getInt(KEY_SHARPNESS);
+        }
+
+        /**
+         * Set Sharpness Level
+         *
+         * @param sharpness level
+         * @hide
+         */
+        public void setSharpness(int sharpness){
+            if((sharpness < 0) || (sharpness > getMaxSharpness()) )
+                throw new IllegalArgumentException(
+                        "Invalid Sharpness " + sharpness);
+
+            set(KEY_SHARPNESS, String.valueOf(sharpness));
+        }
+
+        /**
+         * Get Max Sharpness Level
+         *
+         * @return max sharpness level
+         * @hide
+         */
+        public int getMaxSharpness(){
+            return getInt(KEY_MAX_SHARPNESS);
+        }
+
+        /**
+         * Get Contrast level
+         *
+         * @return contrast level
+         * @hide
+         */
+        public int getContrast(){
+            return getInt(KEY_CONTRAST);
+        }
+
+        /**
+         * Set Contrast Level
+         *
+         * @param contrast level
+         * @hide
+         */
+        public void setContrast(int contrast){
+            if((contrast < 0 ) || (contrast > getMaxContrast()))
+                throw new IllegalArgumentException(
+                        "Invalid Contrast " + contrast);
+
+            set(KEY_CONTRAST, String.valueOf(contrast));
+        }
+
+        /**
+         * Get Max Contrast Level
+         *
+         * @return max contrast level
+         * @hide
+         */
+        public int getMaxContrast(){
+            return getInt(KEY_MAX_CONTRAST);
+        }
+
+        /**
+         * Get Saturation level
+         *
+         * @return saturation level
+         * @hide
+         */
+        public int getSaturation(){
+            return getInt(KEY_SATURATION);
+        }
+
+        /**
+         * Set Saturation Level
+         *
+         * @param saturation level
+         * @hide
+         */
+        public void setSaturation(int saturation){
+            if((saturation < 0 ) || (saturation > getMaxSaturation()))
+                throw new IllegalArgumentException(
+                        "Invalid Saturation " + saturation);
+
+            set(KEY_SATURATION, String.valueOf(saturation));
+        }
+
+        /**
+         * Get Max Saturation Level
+         *
+         * @return max contrast level
+         * @hide
+         */
+        public int getMaxSaturation(){
+            return getInt(KEY_MAX_SATURATION);
+        }
         /**
          * Gets the current antibanding setting.
          *

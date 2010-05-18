@@ -145,6 +145,15 @@ public:
     // stored in JPEG EXIF header.
     // Example value: "1251192757". Write only.
     static const char KEY_GPS_TIMESTAMP[];
+    //Sharpness
+    static const char KEY_SHARPNESS[];
+    static const char KEY_MAX_SHARPNESS[];
+    //Contrast
+    static const char KEY_CONTRAST[];
+    static const char KEY_MAX_CONTRAST[];
+    //Saturation
+    static const char KEY_SATURATION[];
+    static const char KEY_MAX_SATURATION[];
     // Current white balance setting.
     // Example value: "auto" or WHITE_BALANCE_XXX constants. Read/write.
     static const char KEY_WHITE_BALANCE[];
