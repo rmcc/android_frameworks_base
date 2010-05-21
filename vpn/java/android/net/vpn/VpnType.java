@@ -28,11 +28,8 @@ public enum VpnType {
     L2TP_IPSEC_PSK("L2TP/IPSec PSK", R.string.l2tp_ipsec_psk_vpn_description,
             L2tpIpsecPskProfile.class),
     L2TP_IPSEC("L2TP/IPSec CRT", R.string.l2tp_ipsec_crt_vpn_description,
-            L2tpIpsecProfile.class);
-    /* OpenVPN won't work until CAP_NET_ADMIN does... which won't happen until
-     * we get a proper kernel :(   
-      ,
-    OPENVPN("OpenVPN", R.string.openvpn_vpn_description, OpenvpnProfile.class); */
+            L2tpIpsecProfile.class),
+    OPENVPN("OpenVPN", R.string.openvpn_vpn_description, OpenvpnProfile.class);
 
     private String mDisplayName;
     private int mDescriptionId;
