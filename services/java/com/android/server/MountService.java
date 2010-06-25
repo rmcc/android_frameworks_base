@@ -422,6 +422,9 @@ class MountService extends IMountService.Stub
                 String state = Environment.MEDIA_REMOVED;
 
                 try {
+		    /* There's a race condition here. 5 seconds are enough
+                     * to avoid it, 2 should be sufficient */
+		    Thread.sleep(2000);
                     String[] vols = mConnector.doListCommand(
                         "volume list", VoldResponseCode.VolumeListResult);
                     for (String volstr : vols) {
