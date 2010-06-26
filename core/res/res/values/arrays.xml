@@ -139,6 +139,7 @@
         <item><xliff:g id="id">sync_active</xliff:g></item>
         <item><xliff:g id="id">sync_failing</xliff:g></item>
         <item><xliff:g id="id">ime</xliff:g></item>
+        <item><xliff:g id="id">headset_active</xliff:g></item>
     </string-array>
 
 </resources>
