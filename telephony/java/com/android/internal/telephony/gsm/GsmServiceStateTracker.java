@@ -587,6 +587,10 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
                 getText(com.android.internal.R.string.emergency_calls_only).toString();
         }
 
+	if (!TextUtils.equals(spn, "") && spn != null && showSpn) {
+		showPlmn = false;
+	}
+
         if (rule != curSpnRule
                 || !TextUtils.equals(spn, curSpn)
                 || !TextUtils.equals(plmn, curPlmn)) {
