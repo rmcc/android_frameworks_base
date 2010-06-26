@@ -30,6 +30,7 @@ namespace android {
 class CameraHardwareStub : public CameraHardwareInterface {
 public:
     virtual sp<IMemoryHeap> getPreviewHeap() const;
+    virtual sp<IMemoryHeap> getPreviewHeapnew(int i) const;
     virtual sp<IMemoryHeap> getRawHeap() const;
 
     virtual void        setCallbacks(notify_callback notify_cb,
@@ -121,6 +122,7 @@ private:
 
     notify_callback    mNotifyCb;
     data_callback      mDataCb;
+    data_indexed_callback      mDataIndexedCb;
     data_callback_timestamp mDataCbTimestamp;
     void               *mCallbackCookie;
 

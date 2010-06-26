@@ -139,12 +139,13 @@ private:
 
         static      void        notifyCallback(int32_t msgType, int32_t ext1, int32_t ext2, void* user);
         static      void        dataCallback(int32_t msgType, const sp<IMemory>& dataPtr, void* user);
+        static      void        dataIndexedCallback(int32_t msgType, const sp<IMemory>& dataPtr, int index, void* user);
         static      void        dataCallbackTimestamp(nsecs_t timestamp, int32_t msgType,
                                                       const sp<IMemory>& dataPtr, void* user);
 
         static      sp<Client>  getClientFromCookie(void* user);
 
-                    void        handlePreviewData(const sp<IMemory>&);
+                    void        handlePreviewData(const sp<IMemory>&, int index);
                     void        handleShutter(image_rect_type *image);
                     void        handlePostview(const sp<IMemory>&);
                     void        handleRawPicture(const sp<IMemory>&);
