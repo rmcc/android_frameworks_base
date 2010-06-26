@@ -57,7 +57,7 @@ class StatusBarIcon {
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.MATCH_PARENT);
                 t.setTextSize(16);
-                t.setTextColor(0xff000000);
+                t.setTextColor(0xffffffff);
                 t.setTypeface(Typeface.DEFAULT_BOLD);
                 t.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
                 t.setPadding(6, 0, 0, 0);
