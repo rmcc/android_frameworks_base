@@ -160,11 +160,13 @@ static void setBooleanField(JNIEnv* env, jobject obj, const char* path, jfieldID
     const int SIZE = 16;
     char buf[SIZE];
     
-    jboolean value = false;
+    jboolean value = true;
     if (readFromFile(path, buf, SIZE) > 0) {
-        if (buf[0] == '1') {
-            value = true;
+        if (buf[0] == '0') {
+            value = false;
         }
+    } else {
+        value = false;
     }
     env->SetBooleanField(obj, fieldID, value);
 }
