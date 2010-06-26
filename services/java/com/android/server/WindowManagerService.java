@@ -6362,6 +6362,19 @@ public class WindowManagerService extends IWindowManager.Stub
                     boolean screenIsDim = !mPowerManager.isScreenBright();
                     int actions = mPolicy.interceptKeyTq(event, !screenIsOff);
 
+		    // Start ONE hack
+		    // Change green/red key events
+                    if ((actions & WindowManagerPolicy.ACTION_TRANSLATE_KEY) != 0) {
+                    	if (event.keycode == KeyEvent.KEYCODE_ENDCALL) {
+				/* Red becomes back... */
+				event.keycode = KeyEvent.KEYCODE_BACK;
+			} else if (event.keycode == KeyEvent.KEYCODE_CALL) {
+				/* Green becomes menu... */
+				event.keycode = KeyEvent.KEYCODE_MENU;
+			}
+		    }
+		    // Finish ONE hack
+
                     if ((actions & WindowManagerPolicy.ACTION_GO_TO_SLEEP) != 0) {
                         mPowerManager.goToSleep(event.when);
                     }
