@@ -587,10 +587,6 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
                 getText(com.android.internal.R.string.emergency_calls_only).toString();
         }
 
-	if (!TextUtils.equals(spn, "") && spn != null && showSpn) {
-		showPlmn = false;
-	}
-
         if (rule != curSpnRule
                 || !TextUtils.equals(spn, curSpn)
                 || !TextUtils.equals(plmn, curPlmn)) {
@@ -598,6 +594,11 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
                 && (rule & SIMRecords.SPN_RULE_SHOW_SPN) == SIMRecords.SPN_RULE_SHOW_SPN;
             boolean showPlmn =
                 (rule & SIMRecords.SPN_RULE_SHOW_PLMN) == SIMRecords.SPN_RULE_SHOW_PLMN;
+
+	    if (!TextUtils.equals(spn, "") && spn != null && showSpn) {
+		showPlmn = false;
+	    }
+
 
             Intent intent = new Intent(Intents.SPN_STRINGS_UPDATED_ACTION);
             intent.addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
