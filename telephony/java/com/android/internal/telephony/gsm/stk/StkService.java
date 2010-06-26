@@ -466,6 +466,8 @@ public class StkService extends Handler implements AppInterface {
             thread.start();
             sInstance = new StkService(ci, sr, context, fh, sc);
             StkLog.d(sInstance, "NEW sInstance");
+	    // RCMod: Need this for libril-qc-1.so wrapper compatibility
+            ci.setStkProfile(null);
         } else if ((sr != null) && (mSimRecords != sr)) {
             StkLog.d(sInstance, "Reinitialize the Service with SIMRecords");
             mSimRecords = sr;
