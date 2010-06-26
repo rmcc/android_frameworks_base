@@ -295,7 +295,7 @@ bool BootAnimation::android()
     const Rect updateRect(xc, yc, xc + mAndroid[0].w, yc + mAndroid[0].h);
 
     // draw and update only what we need
-    mFlingerSurface->setSwapRectangle(updateRect);
+    //mFlingerSurface->setSwapRectangle(updateRect);
 
     glScissor(updateRect.left, mHeight - updateRect.bottom, updateRect.width(),
             updateRect.height());
