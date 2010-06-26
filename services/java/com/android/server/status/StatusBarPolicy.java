@@ -342,6 +342,10 @@ public class StatusBarPolicy {
     private IBinder mCdmaRoamingIndicatorIcon;
     private IconData mCdmaRoamingIndicatorIconData;
 
+    // Wired headset
+    private IBinder mHeadsetIcon;
+    private IconData mHeadsetIconData;
+
     private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -403,6 +407,9 @@ public class StatusBarPolicy {
             }
             else if (action.equals(TtyIntent.TTY_ENABLED_CHANGE_ACTION)) {
                 updateTTY(intent);
+            }
+            else if (action.equals(Intent.ACTION_HEADSET_PLUG)) {
+                toggleHeadsetIcon(intent);
             }
         }
     };
@@ -513,6 +520,13 @@ public class StatusBarPolicy {
         service.setIconVisibility(mVolumeIcon, false);
         updateVolume();
 
+       //Wired headset
+        mHeadsetIconData = IconData.makeIcon(
+                "headset_active",
+                null, com.android.internal.R.drawable.stat_sys_headset, 0, 0);
+        mHeadsetIcon = service.addIcon(mHeadsetIconData, null);
+        service.setIconVisibility(mHeadsetIcon, false);
+ 
         IntentFilter filter = new IntentFilter();
 
         // Register for Intent broadcasts for...
@@ -540,6 +554,7 @@ public class StatusBarPolicy {
         filter.addAction(GpsLocationProvider.GPS_FIX_CHANGE_ACTION);
         filter.addAction(TelephonyIntents.ACTION_SIM_STATE_CHANGED);
         filter.addAction(TtyIntent.TTY_ENABLED_CHANGE_ACTION);
+        filter.addAction(Intent.ACTION_HEADSET_PLUG);
         mContext.registerReceiver(mIntentReceiver, filter, null, mHandler);
 
         // load config to determine if to distinguish Hspa data icon
@@ -643,6 +658,14 @@ public class StatusBarPolicy {
         mService.setIconVisibility(mSyncActiveIcon, isActive);
         // Don't display sync failing icon: BUG 1297963 Set sync error timeout to "never"
         //mService.setIconVisibility(mSyncFailingIcon, isFailing && !isActive);
+    }
+
+    private final void toggleHeadsetIcon(Intent intent) {
+      boolean headsetActive = false;
+      if (intent.getIntExtra("state", 0) > 0 && intent.getStringExtra("name").equals("headset_sensor")) {
+       headsetActive = true;
+      }
+      mService.setIconVisibility(mHeadsetIcon, headsetActive);
     }
 
     private final void updateBattery(Intent intent) {
@@ -1070,7 +1093,6 @@ public class StatusBarPolicy {
     }
 
     private final void updateDataNetType(int net) {
-
         switch (net) {
         case TelephonyManager.NETWORK_TYPE_EDGE:
             mDataIconList = sDataNetType_e;
