@@ -27,6 +27,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -117,7 +118,7 @@ class StatusBarIcon {
                         Gravity.RIGHT | Gravity.CENTER_VERTICAL));
                 mNumberView.setBackgroundDrawable(null);
                 mNumberView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-                mNumberView.setTextSize(12);
+                mNumberView.setTextSize(11);
 
                 if (data.number > 0) {
                     nv.setText("" + data.number);
