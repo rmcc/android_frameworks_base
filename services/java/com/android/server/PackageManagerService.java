@@ -209,7 +209,7 @@ class PackageManagerService extends IPackageManager.Stub {
 
     // This is the object monitoring the system app dir.
     final FileObserver mSystemInstallObserver;
-    final FileObserver mOtherSystemInstallObserver;
+    /*final FileObserver mOtherSystemInstallObserver;*/
 
     // This is the object monitoring mAppInstallDir.
     final FileObserver mAppInstallObserver;
@@ -223,7 +223,7 @@ class PackageManagerService extends IPackageManager.Stub {
 
     final File mFrameworkDir;
     final File mSystemAppDir;
-    final File mOtherSystemAppDir;
+    /*final File mOtherSystemAppDir;*/
     final File mAppInstallDir;
     final File mDalvikCacheDir;
 
@@ -922,12 +922,12 @@ class PackageManagerService extends IPackageManager.Stub {
             scanDirLI(mSystemAppDir, PackageParser.PARSE_IS_SYSTEM
                     | PackageParser.PARSE_IS_SYSTEM_DIR, scanMode);
 
-            mOtherSystemAppDir = new File("/hidden", "app");
+            /*mOtherSystemAppDir = new File("/hidden", "app");
             mOtherSystemInstallObserver = new AppDirObserver(
                 mOtherSystemAppDir.getPath(), OBSERVER_EVENTS, true);
             mOtherSystemInstallObserver.startWatching();
             scanDirLI(mOtherSystemAppDir, PackageParser.PARSE_IS_SYSTEM
-                    | PackageParser.PARSE_IS_SYSTEM_DIR, scanMode);
+                    | PackageParser.PARSE_IS_SYSTEM_DIR, scanMode);*/
             
             if (mInstaller != null) {
                 if (DEBUG_UPGRADE) Log.v(TAG, "Running installd update commands");
