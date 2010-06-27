@@ -145,10 +145,12 @@ uint32_t Context::runScript(Script *s, uint32_t launchID)
 
 void Context::checkError(const char *msg) const
 {
+   /* The current  software GL on the ONE has a lot of unsupported operations
+    * Don't pollute the logs with these...
     GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
         LOGE("GL Error, 0x%x, from %s", err, msg);
-    }
+    }*/
 }
 
 uint32_t Context::runRootScript()
@@ -498,7 +500,7 @@ void Context::setSurface(uint32_t w, uint32_t h, android_native_window_t *sur)
         if (!mEGL.mContext) {
             first = true;
             pthread_mutex_lock(&gInitMutex);
-            initEGL(true);
+            initEGL(false); // RC was here
             pthread_mutex_unlock(&gInitMutex);
         }
 
