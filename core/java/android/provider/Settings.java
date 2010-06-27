@@ -1678,6 +1678,13 @@ public final class Settings {
          */
         public static final String UNLOCK_SOUND = "unlock_sound";
 
+
+        /**
+         * Whether to show the battery level percentage overlayed on the icon.
+         * @hide
+         */
+        public static final String BATTERY_PERCENTAGE_STATUS_ICON = "battery_percentage_status_icon";
+        
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
