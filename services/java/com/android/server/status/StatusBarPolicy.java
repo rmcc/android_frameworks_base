@@ -709,12 +709,14 @@ public class StatusBarPolicy {
          * the device does not charge when plugged into USB (since he/she would
          * not see the same battery screen on USB as he sees on brick).
          */
-        /* else {
+        /*
+            Nah... I still prefer the battery view -- RC */
+	 else {
             if (plugged && !oldPlugged) {
                 showBatteryView();
             }
         }
-        */
+        /**/
         if (false) {
             Slog.d(TAG, "plugged=" + plugged + " oldPlugged=" + oldPlugged + " level=" + level);
         }
