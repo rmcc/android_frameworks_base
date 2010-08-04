@@ -70,6 +70,18 @@ class ServerThread extends Thread {
         }
     }
 
+	/* Kanged from cyanogenmod. Much cleaner than my original version */
+	private class JitSettingsObserver extends ContentObserver {
+		public JitSettingsObserver() {
+			super(null);
+		}
+		@Override
+		public void onChange(boolean selfChange) {
+			SystemProperties.set("persist.sys.jit-enable",
+					Settings.Secure.getString(mContentResolver, Settings.Secure.JIT_ENABLE));
+		}
+	}
+
     @Override
     public void run() {
         EventLog.writeEvent(EventLogTags.BOOT_PROGRESS_SYSTEM_RUN,
@@ -432,9 +444,11 @@ class ServerThread extends Thread {
         Settings.Secure.putInt(mContentResolver, Settings.Secure.ADB_ENABLED,
                 "1".equals(SystemProperties.get("persist.service.adb.enable")) ? 1 : 0);
 
-        // register observer to listen for settings changes
+        // register observers to listen for settings changes
         mContentResolver.registerContentObserver(Settings.Secure.getUriFor(Settings.Secure.ADB_ENABLED),
                 false, new AdbSettingsObserver());
+        mContentResolver.registerContentObserver(Settings.Secure.getUriFor(Settings.Secure.JIT_ENABLE),
+                false, new JitSettingsObserver());
 
         // Before things start rolling, be sure we have decided whether
         // we are in safe mode.
