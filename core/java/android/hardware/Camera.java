@@ -746,6 +746,12 @@ public class Camera {
         private static final String KEY_ZOOM_RATIOS = "zoom-ratios";
         private static final String KEY_ZOOM_SUPPORTED = "zoom-supported";
         private static final String KEY_SMOOTH_ZOOM_SUPPORTED = "smooth-zoom-supported";
+        private static final String KEY_SHARPNESS = "sharpness";
+        private static final String KEY_MAX_SHARPNESS = "max-sharpness";
+        private static final String KEY_CONTRAST = "contrast";
+        private static final String KEY_MAX_CONTRAST = "max-contrast";
+        private static final String KEY_SATURATION = "saturation";
+        private static final String KEY_MAX_SATURATION = "max-saturation";
         // Parameter key suffix for supported values.
         private static final String SUPPORTED_VALUES_SUFFIX = "-values";
 
@@ -1786,6 +1792,105 @@ public class Camera {
         public boolean isSmoothZoomSupported() {
             String str = get(KEY_SMOOTH_ZOOM_SUPPORTED);
             return TRUE.equals(str);
+        }
+
+         /**
+          * Get Sharpness level
+         *
+         * @return sharpness level
+         */
+        public int getSharpness(){
+            return get(KEY_SHARPNESS) == null ? 0 
+					: getInt(KEY_SHARPNESS);
+        }
+
+        /**
+         * Set Sharpness Level
+         *
+         * @param sharpness level
+         */
+        public void setSharpness(int sharpness){
+            if((sharpness < 0) || (sharpness > getMaxSharpness()) )
+                throw new IllegalArgumentException(
+                        "Invalid Sharpness " + sharpness);
+
+            set(KEY_SHARPNESS, String.valueOf(sharpness));
+        }
+
+        /**
+         * Get Max Sharpness Level
+         *
+         * @return max sharpness level
+         */
+        public int getMaxSharpness(){
+            return get(KEY_MAX_SHARPNESS) == null ? 0 
+					: getInt(KEY_MAX_SHARPNESS);
+        }
+
+        /**
+         * Get Contrast level
+         *
+         * @return contrast level
+         */
+        public int getContrast(){
+            return get(KEY_CONTRAST) == null ? 0 
+					: getInt(KEY_CONTRAST);
+        }
+
+        /**
+         * Set Contrast Level
+         *
+         * @param contrast level
+         */
+        public void setContrast(int contrast){
+            if((contrast < 0 ) || (contrast > getMaxContrast()))
+                throw new IllegalArgumentException(
+                        "Invalid Contrast " + contrast);
+
+            set(KEY_CONTRAST, String.valueOf(contrast));
+        }
+
+        /**
+         * Get Max Contrast Level
+         *
+         * @return max contrast level
+         */
+        public int getMaxContrast(){
+            return get(KEY_MAX_CONTRAST) == null ? 0 
+					: getInt(KEY_MAX_CONTRAST);
+        }
+
+        /**
+         * Get Saturation level
+         *
+         * @return saturation level
+         */
+        public int getSaturation(){
+            return get(KEY_SATURATION) == null ? 0 
+					: getInt(KEY_SATURATION);
+        }
+
+        /**
+         * Set Saturation Level
+         *
+         * @param saturation level
+         */
+        public void setSaturation(int saturation){
+            if((saturation < 0 ) || (saturation > getMaxSaturation()))
+                throw new IllegalArgumentException(
+                        "Invalid Saturation " + saturation);
+
+            set(KEY_SATURATION, String.valueOf(saturation));
+        }
+
+        /**
+         * Get Max Saturation Level
+         *
+         * @return max contrast level
+         */
+        public int getMaxSaturation(){
+            return get(KEY_MAX_SATURATION) == null ? 0 
+						: getInt(KEY_MAX_SATURATION);
         }
 
         // Splits a comma delimited string to an ArrayList of String.

@@ -220,6 +220,15 @@ public:
     // CAMERA_MSG_ZOOM in frameworks/base/include/camera/Camera.h.
     // Example value: "true". Read only.
     static const char KEY_SMOOTH_ZOOM_SUPPORTED[];
+    //Sharpness
+    static const char KEY_SHARPNESS[];
+    static const char KEY_MAX_SHARPNESS[];
+    //Contrast
+    static const char KEY_CONTRAST[];
+    static const char KEY_MAX_CONTRAST[];
+    //Saturation
+    static const char KEY_SATURATION[];
+    static const char KEY_MAX_SATURATION[];
 
     // Value for KEY_ZOOM_SUPPORTED or KEY_SMOOTH_ZOOM_SUPPORTED.
     static const char TRUE[];

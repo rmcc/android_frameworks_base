@@ -69,6 +69,12 @@ const char CameraParameters::KEY_MAX_ZOOM[] = "max-zoom";
 const char CameraParameters::KEY_ZOOM_RATIOS[] = "zoom-ratios";
 const char CameraParameters::KEY_ZOOM_SUPPORTED[] = "zoom-supported";
 const char CameraParameters::KEY_SMOOTH_ZOOM_SUPPORTED[] = "smooth-zoom-supported";
+const char CameraParameters::KEY_SHARPNESS[] = "sharpness";
+const char CameraParameters::KEY_MAX_SHARPNESS[] = "max-sharpness";
+const char CameraParameters::KEY_CONTRAST[] = "contrast";
+const char CameraParameters::KEY_MAX_CONTRAST[] = "max-contrast";
+const char CameraParameters::KEY_SATURATION[] = "saturation";
+const char CameraParameters::KEY_MAX_SATURATION[] = "max-saturation";
 
 const char CameraParameters::TRUE[] = "true";
 
