@@ -807,7 +807,7 @@ int EventHub::open_device(const char *deviceName)
         device->layoutMap->load(keylayoutFilename);
 
         // tell the world about the devname (the descriptive name)
-        if (!mHaveFirstKeyboard && !defaultKeymap && strstr(name, "-keypad")) {
+        if (!mHaveFirstKeyboard && !defaultKeymap/* && strstr(name, "-keypad")*/) {
             // the built-in keyboard has a well-known device ID of 0,
             // this device better not go away.
             mHaveFirstKeyboard = true;
