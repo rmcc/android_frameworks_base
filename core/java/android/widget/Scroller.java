@@ -175,11 +175,8 @@ public class Scroller  {
             return false;
         }
 
-		int timePassed = (int)(AnimationUtils.currentAnimationTimeMillis() - mScrollerX.mStartTime);
-		if (timePassed < mScrollerX.mDuration) {
         switch (mMode) {
             case SCROLL_MODE:
-                float x = (float)timePassed * (1.0f / (float) mScrollerX.mDuration);
                 long time = AnimationUtils.currentAnimationTimeMillis();
                 // Any scroller can be used for time, since they were started
                 // together in scroll mode. We use X here.
@@ -222,7 +219,6 @@ public class Scroller  {
                 
                 break;
         }
-		}
 
         return true;
     }
