@@ -1684,6 +1684,12 @@ public final class Settings {
          * @hide
          */
         public static final String BATTERY_PERCENTAGE_STATUS_ICON = "battery_percentage_status_icon";
+
+        /**
+         * Whether to allow overscrolling (edge bounce effect on lists)
+         * @hide
+         */
+        public static final String ALLOW_OVERSCROLL = "allow_overscroll";
         
         /**
          * Settings to backup. This is here so that it's in the same place as the settings

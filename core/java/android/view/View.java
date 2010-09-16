@@ -65,6 +65,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ScrollBarDrawable;
+import android.provider.Settings;
 
 import java.lang.ref.SoftReference;
 import java.lang.reflect.InvocationTargetException;
@@ -8729,7 +8730,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback, Accessibility
             int scrollRangeX, int scrollRangeY,
             int maxOverscrollX, int maxOverscrollY,
             boolean isTouchEvent) {
-        final int overscrollMode = mOverscrollMode;
+        final int overscrollMode = getOverscrollMode();
         final boolean canScrollHorizontal = 
                 computeHorizontalScrollRange() > computeHorizontalScrollExtent();
         final boolean canScrollVertical = 
@@ -8834,6 +8835,10 @@ public class View implements Drawable.Callback, KeyEvent.Callback, Accessibility
      * @return This view's overscroll mode.
      */
     public int getOverscrollMode() {
+		if (Settings.System.getInt(mContext.getContentResolver(), 
+				Settings.System.ALLOW_OVERSCROLL, 1) <= 0)
+			return OVERSCROLL_NEVER;
+
         return mOverscrollMode;
     }
     
