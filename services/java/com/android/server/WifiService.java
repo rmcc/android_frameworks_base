@@ -140,7 +140,6 @@ public class WifiService extends IWifiManager.Stub {
      * being enabled but not active exceeds the battery drain caused by
      * re-establishing a connection to the mobile data network.
      */
-    //private static final long DEFAULT_IDLE_MILLIS = 15 * 60 * 1000; /* 15 minutes */
     private static final long DEFAULT_IDLE_MILLIS = 2 * 60 * 1000; /* 2 minutes */
 
     private static final String WAKELOCK_TAG = "WifiService";
@@ -1670,9 +1669,7 @@ public class WifiService extends IWifiManager.Stub {
                  * or plugged in to AC).
                  */
 	
-                Slog.d(TAG, "Should Wifi stay awake? - " + stayAwakeConditions + " / " + mPluggedType);
                 if (!shouldWifiStayAwake(stayAwakeConditions, mPluggedType)) {
-                Slog.d(TAG, "No");
                     WifiInfo info = mWifiStateTracker.requestConnectionInfo();
                     if (info.getSupplicantState() != SupplicantState.COMPLETED) {
                         // we used to go to sleep immediately, but this caused some race conditions
@@ -1691,7 +1688,6 @@ public class WifiService extends IWifiManager.Stub {
                         mAlarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, mIdleIntent);
                     }
                 }
-                else Slog.d(TAG, "Yes");
                 /* we can return now -- there's nothing to do until we get the idle intent back */
                 return;
             } else if (action.equals(ACTION_DEVICE_IDLE)) {
