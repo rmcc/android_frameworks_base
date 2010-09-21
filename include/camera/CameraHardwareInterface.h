@@ -45,10 +45,6 @@ typedef void (*notify_callback)(int32_t msgType,
 typedef void (*data_callback)(int32_t msgType,
                               const sp<IMemory>& dataPtr,
                               void* user);
-typedef void (*data_indexed_callback)(int32_t msgType,
-                              const sp<IMemory>& dataPtr,
-			      int index,
-                              void* user);
 
 typedef void (*data_callback_timestamp)(nsecs_t timestamp,
                                         int32_t msgType,
@@ -92,22 +88,16 @@ public:
 
     /** Return the IMemoryHeap for the preview image heap */
     virtual sp<IMemoryHeap>         getPreviewHeap() const = 0;
-    virtual sp<IMemoryHeap>         getPreviewHeapnew(int i) const = 0;
 
     /** Return the IMemoryHeap for the raw image heap */
     virtual sp<IMemoryHeap>         getRawHeap() const = 0;
 
     /** Set the notification and data callbacks */
-    /*virtual void setCallbacks(notify_callback notify_cb,
-                              data_callback data_cb,
-                              data_callback_timestamp data_cb_timestamp,
-                              void* user) = 0;*/
-
     virtual void setCallbacks(notify_callback notify_cb,
                               data_callback data_cb,
-                              data_indexed_callback data_indexed_cb,
                               data_callback_timestamp data_cb_timestamp,
                               void* user) = 0;
+
     /**
      * The following three functions all take a msgtype,
      * which is a bitmask of the messages defined in

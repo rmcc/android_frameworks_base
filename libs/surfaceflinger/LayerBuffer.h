@@ -105,9 +105,7 @@ private:
             return mSupportsCopybit;
         }
         inline status_t getStatus() const {
-            return (mBufferHeap.htype == MULTI_HEAP) ?
-                   (mBufferHeap.heaps[0]!=0 ? NO_ERROR : NO_INIT) :
-                   (mBufferHeap.heap!=0 ? NO_ERROR : NO_INIT);
+            return mBufferHeap.heap!=0 ? NO_ERROR : NO_INIT;
         }
         inline const NativeBuffer& getBuffer() const {
             return mNativeBuffer;
