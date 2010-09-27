@@ -1690,6 +1690,12 @@ public final class Settings {
          * @hide
          */
         public static final String ALLOW_OVERSCROLL = "allow_overscroll";
+
+        /**
+         * Whether to allow the MENU key to unlock the keyguard
+         * @hide
+         */
+        public static final String MENU_KEY_UNLOCK = "allow_menukey_unlock";
         
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
