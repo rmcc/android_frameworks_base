@@ -589,15 +589,22 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
 
         spn = ss.getOperatorAlphaShort();
 
+		if (spn != null && spn.length() < 1) {
+			spn = null;
+		}
+		if (plmn != null && plmn.length() < 1) {
+			plmn = null;
+		}
+
         if (rule != curSpnRule
                 || !TextUtils.equals(spn, curSpn)
                 || !TextUtils.equals(plmn, curPlmn)) {
-            boolean showSpn = !mEmergencyOnly
+            boolean showSpn = !mEmergencyOnly && spn != null
                 /*&& (rule & SIMRecords.SPN_RULE_SHOW_SPN) == SIMRecords.SPN_RULE_SHOW_SPN*/;
             boolean showPlmn =
                 (rule & SIMRecords.SPN_RULE_SHOW_PLMN) == SIMRecords.SPN_RULE_SHOW_PLMN;
 
-            if (!TextUtils.equals(spn, "") && spn != null && showSpn) {
+            if (spn != null && showSpn) {
                 showPlmn = false;
             }
 
