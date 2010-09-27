@@ -429,6 +429,7 @@ public class GpsLocationProvider implements LocationProviderInterface {
      * data network (e.g., the Internet), false otherwise.
      */
     public boolean requiresNetwork() {
+        // RC was here return true;
         return true;
     }
 
@@ -906,12 +907,12 @@ public class GpsLocationProvider implements LocationProviderInterface {
             if (DEBUG) Log.d(TAG, "startNavigating");
             mStarted = true;
             int positionMode;
-            if (Settings.Secure.getInt(mContext.getContentResolver(),
+            /*if (Settings.Secure.getInt(mContext.getContentResolver(),
                     Settings.Secure.ASSISTED_GPS_ENABLED, 1) != 0) {
                 positionMode = GPS_POSITION_MODE_MS_BASED;
-            } else {
+            } else {*/
                 positionMode = GPS_POSITION_MODE_STANDALONE;
-            }
+            /*}*/
 
             if (!native_start(positionMode, false, 1)) {
                 mStarted = false;
