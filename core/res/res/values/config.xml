@@ -24,12 +24,12 @@
          alpha compositing functionality in hardware.  If set, the window
          manager will disable alpha trasformation in animations where not
          strictly needed. -->
-    <bool name="config_sf_limitedAlpha">true</bool>
+    <bool name="config_sf_limitedAlpha">false</bool>
     
     <!-- Flag indicating whether the surface flinger is inefficient
          at performing a blur.  Used by parts of the UI to turn off
          the blur effect where it isn't worth the performance hit. -->
-    <bool name="config_sf_slowBlur">true</bool>
+    <bool name="config_sf_slowBlur">false</bool>
     
     <!-- The duration (in milliseconds) of a short animation. -->
     <integer name="config_shortAnimTime">150</integer>
@@ -158,10 +158,10 @@
          the physical keyboard.  0 means it doesn't, 1 means it is accessible
          when the lid is open, 2 means it is accessible when the lid is
          closed.  The default is 0. -->
-    <integer name="config_lidNavigationAccessibility">1</integer>
+    <integer name="config_lidNavigationAccessibility">0</integer>
 
     <!-- Indicate whether the SD card is accessible without removing the battery. -->
-    <bool name="config_batterySdCardAccessibility">true</bool>
+    <bool name="config_batterySdCardAccessibility">false</bool>
 
     <!-- Vibrator pattern for feedback about a long screen/key press -->
     <integer-array name="config_longPressVibePattern">
@@ -231,7 +231,7 @@
     <bool name="config_disableMenuKeyInLockScreen">false</bool>
 
     <!-- Control whether status bar should distinguish HSPA data icon form UMTS data icon on devices -->
-    <bool name="config_hspa_data_distinguishable">true</bool>
+    <bool name="config_hspa_data_distinguishable">false</bool>
 
     <!-- Array of light sensor LUX values to define our levels for auto backlight brightness support.
          The N entries of this array define N + 1 zones as follows:
