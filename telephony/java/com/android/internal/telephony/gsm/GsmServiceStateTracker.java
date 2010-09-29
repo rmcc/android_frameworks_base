@@ -606,6 +606,8 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
 
             if (spn != null && showSpn) {
                 showPlmn = false;
+            } else {
+                showPlmn = true;
             }
 
             Intent intent = new Intent(Intents.SPN_STRINGS_UPDATED_ACTION);
