@@ -39,7 +39,9 @@ public class LightsService {
     static final int LIGHT_ID_ATTENTION = 5;
     static final int LIGHT_ID_BLUETOOTH = 6;
     static final int LIGHT_ID_WIFI = 7;
-    static final int LIGHT_ID_COUNT = 8;
+    static final int LIGHT_ID_CAPS = 8;
+    static final int LIGHT_ID_FN = 9;
+    static final int LIGHT_ID_COUNT = 10;
 
     static final int LIGHT_FLASH_NONE = 0;
     static final int LIGHT_FLASH_TIMED = 1;
